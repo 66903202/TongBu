@@ -543,7 +543,7 @@
        $.isLogin = true;
        $.nickName = '';
        await TotalBean();
-       if (!require('./JS_USER_AGENTS').HelloWorld) {
+       if (!require('./JS_USER_AGENTS.js').HelloWorld) {
          console.log(`\n【京东账号${$.index}】${$.nickName || $.UserName}：运行环境检测失败\n`);
          continue
        }
