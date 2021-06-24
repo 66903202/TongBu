@@ -117,7 +117,7 @@ async function pasture() {
       }
       console.log('获取活动信息成功');
       console.log(`互助码：${$.homeInfo.sharekey}`);
-      $.helpCkList.push($.cookie);
+      //$.helpCkList.push($.cookie);
       $.inviteCodeList.push(
         {
           'use':$.UserName,
@@ -480,11 +480,11 @@ function dealReturn(type, data) {
 
 function getGetRequest(type, url) {
   let ua = ``;
-  if(JXUserAgent){
-    ua = JXUserAgent;
-  }else{
+  //if(JXUserAgent){
+  //  ua = JXUserAgent;
+  //}else{
     ua = `jdpingou;iPhone;4.9.4;14.6;${randomWord(false,40,40)};network/wifi;model/iPhone9,2;appBuild/100579;ADID/00000000-0000-0000-0000-000000000000;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/1;hasOCPay/0;supportBestPay/0;session/936;pap/JA2019_3111800;brand/apple;supportJDSHWK/1;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E200`;
-  }
+  //}
   const method = `GET`;
   let headers = {
     'Origin': `https://st.jingxi.com`,
