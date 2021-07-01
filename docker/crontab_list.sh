@@ -137,5 +137,7 @@
 15 10 * * *  node /scripts/jd_djjl.js >> /scripts/logs/jd_djjl.log 2>&1
 #点点券
 10 0,20 * * * node /scripts/jd_necklace.js >> /scripts/logs/jd_necklace.log 2>&1
+#惊喜签到
+5 0 * * * node /scripts/jx_sign.js >> /scripts/logs/jx_sign.log 2>&1
 ##############可选脚本##############
 
