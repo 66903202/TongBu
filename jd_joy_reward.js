@@ -10,15 +10,6 @@
  */
 
  const $ = new Env("宠汪汪兑换二代目")
- console.log('\n====================Hello World====================\n')
- 
- const https = require('https');
- const http = require('http');
- const stream = require('stream');
- const zlib = require('zlib');
- const vm = require('vm');
- const PNG = require('png-js');
- const UA = require('./USER_AGENTS.js').USER_AGENT;
  
  /**
  * export validate_num = 5
