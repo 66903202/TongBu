@@ -522,7 +522,8 @@ function getRandomArrayElements(arr, count) {
  let cookiesArr = [], cookie = '', notify;
  //$.get = injectToRequest($.get.bind($))
  //$.post = injectToRequest($.post.bind($))
- let validate = '', validateArr = [];
+ let validate = '';
+ $.validateArr = [];
 
  
  // 目标值
@@ -533,7 +534,7 @@ function getRandomArrayElements(arr, count) {
    await requireConfig();
    for (let i = 0; i < cookiesArr.length; i++) {
     validate = await new JDJRValidator().run();
-    validateArr = getRandomArrayElements([...$.validateArr, ...validate], [...$.validateArr, ...validate].length);
+    $.validateArr = getRandomArrayElements([...$.validateArr, ...validate], [...$.validateArr, ...validate].length);
     console.log(`\n${$.validate}\n`);
   }
    if (!cookiesArr[0]) {
