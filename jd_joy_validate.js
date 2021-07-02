@@ -565,12 +565,9 @@ function getRandomArrayElements(arr, count) {
          validate = await new JDJRValidator().run();
          fs.appendFileSync('./validate.txt', validate.validate + '\n', 'utf-8')
        }
-
-
-       }
-     }
-   }
- )()
+      }
+    }
+  })()
  
  
  function init() {

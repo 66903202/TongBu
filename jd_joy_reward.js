@@ -101,8 +101,7 @@
  }
  
  function exchange(beanId) {
-     console.log('exchange()')
-     console.log('validate2: ', validate)
+     console.log('开始兑换')
      return new Promise(async resolve => {
          while (1) {
              if (new Date().getSeconds() < 30) {
