@@ -523,7 +523,6 @@ function getRandomArrayElements(arr, count) {
  //$.get = injectToRequest($.get.bind($))
  //$.post = injectToRequest($.post.bind($))
  let validate = '';
- $.validateArr = [];
 
  
  // 目标值
@@ -532,11 +531,7 @@ function getRandomArrayElements(arr, count) {
  
  !(async () => {
    await requireConfig();
-   for (let i = 0; i < cookiesArr.length; i++) {
-    validate = await new JDJRValidator().run();
-    console.log(`\n${validate.validate}\n`);
-    $.validateArr = getRandomArrayElements([...$.validateArr, ...validate.validate], [...$.validateArr, ...validate.validate].length);
-  }
+
    if (!cookiesArr[0]) {
      $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
      return;
@@ -563,8 +558,9 @@ function getRandomArrayElements(arr, count) {
        subTitle = '';
  
        let tasks = await init();
- 
- 
+       
+       validate = await new JDJRValidator().run();
+
        let h = new Date().getHours();
        let config = ''
        if (h >= 0 && h < 8)
@@ -622,7 +618,7 @@ function getRandomArrayElements(arr, count) {
    console.log('exchange()')
    return new Promise(resolve => {
      $.post({
-       url: `https://jdjoy.jd.com/common/gift/new/exchange?reqSource=h5&invokeKey=NRp8OPxZMFXmGkaE`,
+       url: `https://jdjoy.jd.com/common/gift/new/exchange?reqSource=h5&invokeKey=NRp8OPxZMFXmGkaE&validate={${validate.validate}}`,
        headers: {
          "Host": "jdjoy.jd.com",
          "Accept-Language": "zh-cn",
