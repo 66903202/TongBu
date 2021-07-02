@@ -570,7 +570,7 @@ function getRandomArrayElements(arr, count) {
        }
      }
    }
- })()
+ )()
  
  
  function init() {
