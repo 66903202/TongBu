@@ -534,6 +534,7 @@ function getRandomArrayElements(arr, count) {
    await requireConfig();
    for (let i = 0; i < cookiesArr.length; i++) {
     validate = await new JDJRValidator().run();
+    validate = JSON.parse(validate);
     console.log(`\n${$.validate.validate}\n`);
     $.validateArr = getRandomArrayElements([...$.validateArr, ...validate], [...$.validateArr, ...validate].length);
   }
