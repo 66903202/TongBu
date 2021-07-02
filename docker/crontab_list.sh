@@ -11,7 +11,12 @@
 1,31 0-23/1 * * * node /scripts/jd_live_redrain.js >> /scripts/logs/jd_live_redrain.log 2>&1
 #狂欢欧洲杯
 cron 0 10 * * * node /scripts/jd_europeancup.js >> /scripts/logs/jd_europeancup.log 2>&1
-
+#星系牧场
+cron 1 0-23/2 * * * node /scripts/jd_qqxing.js >> /scripts/logs/jd_qqxing.log 2>&1
+#特物Z|万物皆可国创
+cron 30 11 * * * node /scripts/jd_superBrand.js >> /scripts/logs/jd_superBrand.log 2>&1
+#柠檬我是大老板农场
+cron 5 0-23/6 * * * node /scripts/jd_wsdlb.js >> /scripts/logs/jd_wsdlb.log 2>&1
 # 京享值PK
 15 0,6,13,19,21 * * * node /scripts/jd_ddo_pk.js >> /scripts/logs/jd_ddo_pk.log 2>&1
 #金榜创造营 活动时间：2021-05-21至2021-12-31
@@ -117,6 +122,10 @@ cron 0 10 * * * node /scripts/jd_europeancup.js >> /scripts/logs/jd_europeancup.
 5 0 * * * node /scripts/jd_jin_tie.js >> /scripts/logs/jd_jin_tie.log 2>&1
 #京喜牧场
 15 0,12,22 * * * node /scripts/jd_jxmc.js >> /scripts/logs/jd_jxmc.log 2>&1
+#京喜牧场刷金币
+cron 10 * * * * node /scripts/jx_mc_coin.js >> /scripts/logs/jx_mc_coin.log 2>&1
+#京喜牧场清空白菜
+cron 10 * * * * node /scripts/jx_mc_emptycabbage.js >> /scripts/logs/jx_mc_emptycabbage.log 2>&1
 #京东试用
 10 10,18 * * * node /scripts/jd_try.js >> /scripts/logs/jd_try.log 2>&1
 #东东电竞经理
