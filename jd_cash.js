@@ -277,7 +277,7 @@ function getReward(source = 1) {
 function exchange1() {
   let body = '';
   const data = {"clientVersion":"10.0.1"}
-  body = `body=${encodeURIComponent(JSON.stringify(data))}&st=1624027590903&sign=909f011e78f56b7595f4faae79f98669&sv=122`;
+  body = `clientVersion=10.0.1&build=88405&client=android&d_brand=HUAWEI&d_model=NOP-AN00&osVersion=9&screen=1920*1080&partner=xiaomi001&oaid=a519e7caefd6d12&eid=eidAed6d812253sc/UqDm2BNShybii+AtqAeEv1KhRKS/zL1VYb/sYfOobiBsOmxTVjj/zB2Z7Jk3T1YT8WRh6dwhwdIdEPnBJDBZ4Ut8mAHlOUYrLtW&sdkVersion=28&lang=zh_CN&uuid=a1c106409606e6c4&aid=a1c106409606e6c4&area=27_2376_50236_56688&networkType=4g&wifiBssid=unknown&uts=0f31TVRjBSvNio4N%2BCtmlAvkXL6JZzoo26PTJkn0J96Z%2Bir%2F67v%2FPBBqJt2rV3Kg5sFh8y5qVUGyYzzCYZspU68T9xX7xBzx%2BX9n4ArYPsiFQW5NShmt%2FFyeY9GpU65ocpvIH5b2bHlUngELLpbMuyyitkXirg8v074MdWdGlSV0NyWOOY%2BBvZq0ys3p8n81rtwPzgz5Ajgn08UH4y3Jnw%3D%3D&uemps=0-0&st=1624027590903&sign=909f011e78f56b7595f4faae79f98669&sv=122`;
   return new Promise((resolve) => {
     const options = {
       url: `${JD_API_HOST}?functionId=cash_getRedPacket&${body}`,
