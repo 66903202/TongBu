@@ -83,7 +83,7 @@ function showMsg() {
 
 function exchange() {
   return new Promise(resolve => {
-    $.post(taskUrl('v1/user/exchange/bean/check'), (err, resp, data) => {
+    $.get(taskUrl('v1/user/exchange/bean/check'), (err, resp, data) => {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
