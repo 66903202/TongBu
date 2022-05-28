@@ -86,7 +86,7 @@ function exchange() {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} user/exchange/bean API请求失败，请检查网路重试\n`)
+          //console.log(`${$.name} user/exchange/bean API请求失败，请检查网路重试\n`)
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -106,9 +106,9 @@ function taskUrl(function_id, body = {}) {
   return {
     url: `${JD_API_HOST}${function_id}?timestamp=${new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000}`,
     headers: {
-      "Accept": "*/*",
+      "Accept": "application/json,text/plain,*/*",
       "Accept-Encoding": "gzip, deflate, br",
-      "Accept-Language": "zh-cn",
+      "Accept-Language": "zh-CN,en-US;q=0.9",
       "Connection": "keep-alive",
       "Content-Type": "application/x-www-form-urlencoded",
       "Host": "car-member.jd.com",
