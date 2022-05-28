@@ -310,12 +310,12 @@ function exchange1() {
                 $.exchangeBeanNum += parseInt(data.data.result.needMoney);
                 $.canLoop = false;
               } else {
-                console.log('花费2元红包兑换200京豆失败：' + data.data.bizMsg)
+                console.log('兑换10元红包：' + data.data.bizMsg)
                 if (data.data.bizCode === 504) $.canLoop = true;
                 if (data.data.bizCode === 120) $.canLoop = false;
               }
             } else {
-              console.log(`兑换京豆失败：${JSON.stringify(data)}\n`);
+              console.log(`兑换10元红包：${JSON.stringify(data)}\n`);
             }
           }
         }
