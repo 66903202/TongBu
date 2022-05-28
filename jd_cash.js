@@ -108,6 +108,7 @@ async function jdCash() {
     if ($.exchangeBeanNum) {
       message += `兑换京豆成功，获得${$.exchangeBeanNum * 100}京豆\n`;
     }
+    await exchange1();
   }
   await index(true)
   // await showMsg()
@@ -273,6 +274,55 @@ function getReward(source = 1) {
     })
   })
 }
+function exchange1() {
+  let body = '';
+  const data = {"clientVersion":"10.0.1"}
+  body = `body=${encodeURIComponent(JSON.stringify(data))}&st=1624027590903&sign=909f011e78f56b7595f4faae79f98669&sv=122`;
+  return new Promise((resolve) => {
+    const options = {
+      url: `${JD_API_HOST}?functionId=cash_getRedPacket&${body}`,
+      body: `body=%7B%22amount%22%3A1000%2C%22type%22%3A2%7D&`,
+      headers: {
+        'Cookie': cookie,
+        'Host': 'api.m.jd.com',
+        'Connection': 'keep-alive',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.2.2;14.2;%E4%BA%AC%E4%B8%9C/9.2.2 CFNetwork/1206 Darwin/20.1.0"),
+        'Accept-Language': 'zh-cn',
+        'Accept-Encoding': 'gzip, deflate, br',
+      }
+    }
+    $.post(options, async (err, resp, data) => {
+      try {
+        if (err) {
+          console.log(`${JSON.stringify(err)}`)
+          console.log(`${$.name} API请求失败，请检查网路重试`)
+        } else {
+          if (safeGet(data)) {
+            data = JSON.parse(data);
+            if (data['code'] === 0) {
+              if (data.data.bizCode === 0) {
+                console.log(`花费${data.data.result.needMoney}元红包兑换成功！获得${data.data.result.beanName}\n`)
+                $.exchangeBeanNum += parseInt(data.data.result.needMoney);
+                $.canLoop = false;
+              } else {
+                console.log('花费2元红包兑换200京豆失败：' + data.data.bizMsg)
+                if (data.data.bizCode === 504) $.canLoop = true;
+                if (data.data.bizCode === 120) $.canLoop = false;
+              }
+            } else {
+              console.log(`兑换京豆失败：${JSON.stringify(data)}\n`);
+            }
+          }
+        }
+      } catch (e) {
+        $.logErr(e, resp)
+      } finally {
+        resolve(data);
+      }
+    })
+  })
+}
 function exchange2(node) {
   let body = '';
   const data = {node,"configVersion":"1.0"}
@@ -289,8 +339,7 @@ function exchange2(node) {
   }
   return new Promise((resolve) => {
     const options = {
-      //url: `${JD_API_HOST}?functionId=cash_exchangeBeans&t=${Date.now()}&${body}`,
-      url: `${JD_API_HOST}?functionId=cash_getRedPacket&t=${Date.now()}&${body}`,
+      url: `${JD_API_HOST}?functionId=cash_exchangeBeans&t=${Date.now()}&${body}`,
       body: `body=${escape(JSON.stringify(data))}`,
       headers: {
         'Cookie': cookie,
