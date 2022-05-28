@@ -138,3 +138,13 @@
 15 0,12,22 * * * node /scripts/jd_jump.js >> /scripts/logs/jd_jump.log 2>&1
 #京喜牧场
 15 0,12,22 * * * node /scripts/jd_jxmc.js >> /scripts/logs/jd_jxmc.log 2>&1
+
+
+
+
+
+#失效
+#618动物联萌
+#0 */2 * * * node /scripts/jd_zoo.js >> /scripts/logs/jd_zoo.log 2>&1
+#618动物联萌专门收集金币(每小时的第30分运行一次)
+#20,40 * * * * node /scripts/jd_zooCollect.js >> /scripts/logs/jd_zooCollect.log 2>&1
