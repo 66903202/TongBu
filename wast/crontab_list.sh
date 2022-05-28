@@ -148,3 +148,7 @@
 #0 */2 * * * node /scripts/jd_zoo.js >> /scripts/logs/jd_zoo.log 2>&1
 #618动物联萌专门收集金币(每小时的第30分运行一次)
 #20,40 * * * * node /scripts/jd_zooCollect.js >> /scripts/logs/jd_zooCollect.log 2>&1
+#家电星推官 活动时间：2021年5月27日 00:00:00-2021年6月18日 23:59:59
+#0 0 * * * node /scripts/jd_xtg.js >> /scripts/logs/jd_xtg.log 2>&1
+#家电星推官好友互助 活动时间：2021年5月27日 00:00:00-2021年6月18日 23:59:59
+#0 0 * * * node /scripts/jd_xtg_help.js >> /scripts/logs/jd_xtg_help.log 2>&1
