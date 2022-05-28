@@ -1,28 +1,25 @@
 /*
-京东京喜工厂
-更新时间：2021-5-30
-修复做任务、收集电力出现火爆，不能完成任务，重新计算h5st验证
-参考自 ：https://www.orzlee.com/web-development/2021/03/03/lxk0301-jingdong-signin-scriptjingxi-factory-solves-the-problem-of-unable-to-signin.html
-活动入口：京东APP-游戏与互动-查看更多-京喜工厂
-或者: 京东APP首页搜索 "玩一玩" ,造物工厂即可
-
-已支持IOS双京东账号,Node.js支持N个京东账号
-脚本兼容: QuantumultX, Surge, Loon, JSBox, Node.js
-============Quantumultx===============
+Last Modified time: 2021-06-06 21:22:37
+宠汪汪积分兑换奖品脚本, 目前脚本只兑换京豆，兑换京豆成功，才会发出通知提示，其他情况不通知。
+活动入口：京东APP我的-更多工具-宠汪汪
+兑换规则：一个账号一天只能兑换一次京豆。
+兑换奖品成功后才会有系统弹窗通知
+每日京豆库存会在0:00、8:00、16:00更新。
+脚本兼容: Quantumult X, Surge, Loon, JSBox, Node.js
+==============Quantumult X==============
 [task_local]
-#京喜工厂
-10 * * * * https://gitee.com/lxk0301/jd_scripts/raw/master/jd_dreamFactory.js, tag=京喜工厂, img-url=https://github.com/58xinian/icon/raw/master/jdgc.png, enabled=true
+#宠汪汪积分兑换奖品
+0 0-16/8 * * * https://gitee.com/lxk0301/jd_scripts/raw/master/jd_joy_reward.js, tag=宠汪汪积分兑换奖品, img-url=https://raw.githubusercontent.com/58xinian/icon/master/jdcww.png, enabled=true
 
-================Loon==============
+==============Loon==============
 [Script]
-cron "10 * * * *" script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_dreamFactory.js,tag=京喜工厂
+cron "0 0-16/8 * * *" script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_joy_reward.js,tag=宠汪汪积分兑换奖品
 
-===============Surge=================
-京喜工厂 = type=cron,cronexp="10 * * * *",wake-system=1,timeout=3600,script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_dreamFactory.js
+================Surge===============
+宠汪汪积分兑换奖品 = type=cron,cronexp="0 0-16/8 * * *",wake-system=1,timeout=3600,script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_joy_reward.js
 
-============小火箭=========
-京喜工厂 = type=cron,script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_dreamFactory.js, cronexpr="10 * * * *", timeout=3600, enable=true
-
+===============小火箭==========
+宠汪汪积分兑换奖品 = type=cron,script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd_joy_reward.js, cronexpr="0 0-16/8 * * *", timeout=3600, enable=true
  */
 // prettier-ignore
 !function (t, r) { "object" == typeof exports ? module.exports = exports = r() : "function" == typeof define && define.amd ? define([], r) : t.CryptoJS = r() }(this, function () {
@@ -33,40 +30,41 @@ cron "10 * * * *" script-path=https://gitee.com/lxk0301/jd_scripts/raw/master/jd
   }(), function () { function r() { for (var t = this._S, r = this._i, e = this._j, i = 0, n = 0; n < 4; n++) { r = (r + 1) % 256, e = (e + t[r]) % 256; var o = t[r]; t[r] = t[e], t[e] = o, i |= t[(t[r] + t[e]) % 256] << 24 - 8 * n } return this._i = r, this._j = e, i } var e = t, i = e.lib, n = i.StreamCipher, o = e.algo, s = o.RC4 = n.extend({ _doReset: function () { for (var t = this._key, r = t.words, e = t.sigBytes, i = this._S = [], n = 0; n < 256; n++)i[n] = n; for (var n = 0, o = 0; n < 256; n++) { var s = n % e, a = r[s >>> 2] >>> 24 - s % 4 * 8 & 255; o = (o + i[n] + a) % 256; var c = i[n]; i[n] = i[o], i[o] = c } this._i = this._j = 0 }, _doProcessBlock: function (t, e) { t[e] ^= r.call(this) }, keySize: 8, ivSize: 0 }); e.RC4 = n._createHelper(s); var a = o.RC4Drop = s.extend({ cfg: s.cfg.extend({ drop: 192 }), _doReset: function () { s._doReset.call(this); for (var t = this.cfg.drop; t > 0; t--)r.call(this) } }); e.RC4Drop = n._createHelper(a) }(), t.mode.CTRGladman = function () { function r(t) { if (255 === (t >> 24 & 255)) { var r = t >> 16 & 255, e = t >> 8 & 255, i = 255 & t; 255 === r ? (r = 0, 255 === e ? (e = 0, 255 === i ? i = 0 : ++i) : ++e) : ++r, t = 0, t += r << 16, t += e << 8, t += i } else t += 1 << 24; return t } function e(t) { return 0 === (t[0] = r(t[0])) && (t[1] = r(t[1])), t } var i = t.lib.BlockCipherMode.extend(), n = i.Encryptor = i.extend({ processBlock: function (t, r) { var i = this._cipher, n = i.blockSize, o = this._iv, s = this._counter; o && (s = this._counter = o.slice(0), this._iv = void 0), e(s); var a = s.slice(0); i.encryptBlock(a, 0); for (var c = 0; c < n; c++)t[r + c] ^= a[c] } }); return i.Decryptor = n, i }(), function () { function r() { for (var t = this._X, r = this._C, e = 0; e < 8; e++)a[e] = r[e]; r[0] = r[0] + 1295307597 + this._b | 0, r[1] = r[1] + 3545052371 + (r[0] >>> 0 < a[0] >>> 0 ? 1 : 0) | 0, r[2] = r[2] + 886263092 + (r[1] >>> 0 < a[1] >>> 0 ? 1 : 0) | 0, r[3] = r[3] + 1295307597 + (r[2] >>> 0 < a[2] >>> 0 ? 1 : 0) | 0, r[4] = r[4] + 3545052371 + (r[3] >>> 0 < a[3] >>> 0 ? 1 : 0) | 0, r[5] = r[5] + 886263092 + (r[4] >>> 0 < a[4] >>> 0 ? 1 : 0) | 0, r[6] = r[6] + 1295307597 + (r[5] >>> 0 < a[5] >>> 0 ? 1 : 0) | 0, r[7] = r[7] + 3545052371 + (r[6] >>> 0 < a[6] >>> 0 ? 1 : 0) | 0, this._b = r[7] >>> 0 < a[7] >>> 0 ? 1 : 0; for (var e = 0; e < 8; e++) { var i = t[e] + r[e], n = 65535 & i, o = i >>> 16, s = ((n * n >>> 17) + n * o >>> 15) + o * o, h = ((4294901760 & i) * i | 0) + ((65535 & i) * i | 0); c[e] = s ^ h } t[0] = c[0] + (c[7] << 16 | c[7] >>> 16) + (c[6] << 16 | c[6] >>> 16) | 0, t[1] = c[1] + (c[0] << 8 | c[0] >>> 24) + c[7] | 0, t[2] = c[2] + (c[1] << 16 | c[1] >>> 16) + (c[0] << 16 | c[0] >>> 16) | 0, t[3] = c[3] + (c[2] << 8 | c[2] >>> 24) + c[1] | 0, t[4] = c[4] + (c[3] << 16 | c[3] >>> 16) + (c[2] << 16 | c[2] >>> 16) | 0, t[5] = c[5] + (c[4] << 8 | c[4] >>> 24) + c[3] | 0, t[6] = c[6] + (c[5] << 16 | c[5] >>> 16) + (c[4] << 16 | c[4] >>> 16) | 0, t[7] = c[7] + (c[6] << 8 | c[6] >>> 24) + c[5] | 0 } var e = t, i = e.lib, n = i.StreamCipher, o = e.algo, s = [], a = [], c = [], h = o.Rabbit = n.extend({ _doReset: function () { for (var t = this._key.words, e = this.cfg.iv, i = 0; i < 4; i++)t[i] = 16711935 & (t[i] << 8 | t[i] >>> 24) | 4278255360 & (t[i] << 24 | t[i] >>> 8); var n = this._X = [t[0], t[3] << 16 | t[2] >>> 16, t[1], t[0] << 16 | t[3] >>> 16, t[2], t[1] << 16 | t[0] >>> 16, t[3], t[2] << 16 | t[1] >>> 16], o = this._C = [t[2] << 16 | t[2] >>> 16, 4294901760 & t[0] | 65535 & t[1], t[3] << 16 | t[3] >>> 16, 4294901760 & t[1] | 65535 & t[2], t[0] << 16 | t[0] >>> 16, 4294901760 & t[2] | 65535 & t[3], t[1] << 16 | t[1] >>> 16, 4294901760 & t[3] | 65535 & t[0]]; this._b = 0; for (var i = 0; i < 4; i++)r.call(this); for (var i = 0; i < 8; i++)o[i] ^= n[i + 4 & 7]; if (e) { var s = e.words, a = s[0], c = s[1], h = 16711935 & (a << 8 | a >>> 24) | 4278255360 & (a << 24 | a >>> 8), l = 16711935 & (c << 8 | c >>> 24) | 4278255360 & (c << 24 | c >>> 8), f = h >>> 16 | 4294901760 & l, u = l << 16 | 65535 & h; o[0] ^= h, o[1] ^= f, o[2] ^= l, o[3] ^= u, o[4] ^= h, o[5] ^= f, o[6] ^= l, o[7] ^= u; for (var i = 0; i < 4; i++)r.call(this) } }, _doProcessBlock: function (t, e) { var i = this._X; r.call(this), s[0] = i[0] ^ i[5] >>> 16 ^ i[3] << 16, s[1] = i[2] ^ i[7] >>> 16 ^ i[5] << 16, s[2] = i[4] ^ i[1] >>> 16 ^ i[7] << 16, s[3] = i[6] ^ i[3] >>> 16 ^ i[1] << 16; for (var n = 0; n < 4; n++)s[n] = 16711935 & (s[n] << 8 | s[n] >>> 24) | 4278255360 & (s[n] << 24 | s[n] >>> 8), t[e + n] ^= s[n] }, blockSize: 4, ivSize: 2 }); e.Rabbit = n._createHelper(h) }(), t.mode.CTR = function () { var r = t.lib.BlockCipherMode.extend(), e = r.Encryptor = r.extend({ processBlock: function (t, r) { var e = this._cipher, i = e.blockSize, n = this._iv, o = this._counter; n && (o = this._counter = n.slice(0), this._iv = void 0); var s = o.slice(0); e.encryptBlock(s, 0), o[i - 1] = o[i - 1] + 1 | 0; for (var a = 0; a < i; a++)t[r + a] ^= s[a] } }); return r.Decryptor = e, r }(), function () { function r() { for (var t = this._X, r = this._C, e = 0; e < 8; e++)a[e] = r[e]; r[0] = r[0] + 1295307597 + this._b | 0, r[1] = r[1] + 3545052371 + (r[0] >>> 0 < a[0] >>> 0 ? 1 : 0) | 0, r[2] = r[2] + 886263092 + (r[1] >>> 0 < a[1] >>> 0 ? 1 : 0) | 0, r[3] = r[3] + 1295307597 + (r[2] >>> 0 < a[2] >>> 0 ? 1 : 0) | 0, r[4] = r[4] + 3545052371 + (r[3] >>> 0 < a[3] >>> 0 ? 1 : 0) | 0, r[5] = r[5] + 886263092 + (r[4] >>> 0 < a[4] >>> 0 ? 1 : 0) | 0, r[6] = r[6] + 1295307597 + (r[5] >>> 0 < a[5] >>> 0 ? 1 : 0) | 0, r[7] = r[7] + 3545052371 + (r[6] >>> 0 < a[6] >>> 0 ? 1 : 0) | 0, this._b = r[7] >>> 0 < a[7] >>> 0 ? 1 : 0; for (var e = 0; e < 8; e++) { var i = t[e] + r[e], n = 65535 & i, o = i >>> 16, s = ((n * n >>> 17) + n * o >>> 15) + o * o, h = ((4294901760 & i) * i | 0) + ((65535 & i) * i | 0); c[e] = s ^ h } t[0] = c[0] + (c[7] << 16 | c[7] >>> 16) + (c[6] << 16 | c[6] >>> 16) | 0, t[1] = c[1] + (c[0] << 8 | c[0] >>> 24) + c[7] | 0, t[2] = c[2] + (c[1] << 16 | c[1] >>> 16) + (c[0] << 16 | c[0] >>> 16) | 0, t[3] = c[3] + (c[2] << 8 | c[2] >>> 24) + c[1] | 0, t[4] = c[4] + (c[3] << 16 | c[3] >>> 16) + (c[2] << 16 | c[2] >>> 16) | 0, t[5] = c[5] + (c[4] << 8 | c[4] >>> 24) + c[3] | 0, t[6] = c[6] + (c[5] << 16 | c[5] >>> 16) + (c[4] << 16 | c[4] >>> 16) | 0, t[7] = c[7] + (c[6] << 8 | c[6] >>> 24) + c[5] | 0 } var e = t, i = e.lib, n = i.StreamCipher, o = e.algo, s = [], a = [], c = [], h = o.RabbitLegacy = n.extend({ _doReset: function () { var t = this._key.words, e = this.cfg.iv, i = this._X = [t[0], t[3] << 16 | t[2] >>> 16, t[1], t[0] << 16 | t[3] >>> 16, t[2], t[1] << 16 | t[0] >>> 16, t[3], t[2] << 16 | t[1] >>> 16], n = this._C = [t[2] << 16 | t[2] >>> 16, 4294901760 & t[0] | 65535 & t[1], t[3] << 16 | t[3] >>> 16, 4294901760 & t[1] | 65535 & t[2], t[0] << 16 | t[0] >>> 16, 4294901760 & t[2] | 65535 & t[3], t[1] << 16 | t[1] >>> 16, 4294901760 & t[3] | 65535 & t[0]]; this._b = 0; for (var o = 0; o < 4; o++)r.call(this); for (var o = 0; o < 8; o++)n[o] ^= i[o + 4 & 7]; if (e) { var s = e.words, a = s[0], c = s[1], h = 16711935 & (a << 8 | a >>> 24) | 4278255360 & (a << 24 | a >>> 8), l = 16711935 & (c << 8 | c >>> 24) | 4278255360 & (c << 24 | c >>> 8), f = h >>> 16 | 4294901760 & l, u = l << 16 | 65535 & h; n[0] ^= h, n[1] ^= f, n[2] ^= l, n[3] ^= u, n[4] ^= h, n[5] ^= f, n[6] ^= l, n[7] ^= u; for (var o = 0; o < 4; o++)r.call(this) } }, _doProcessBlock: function (t, e) { var i = this._X; r.call(this), s[0] = i[0] ^ i[5] >>> 16 ^ i[3] << 16, s[1] = i[2] ^ i[7] >>> 16 ^ i[5] << 16, s[2] = i[4] ^ i[1] >>> 16 ^ i[7] << 16, s[3] = i[6] ^ i[3] >>> 16 ^ i[1] << 16; for (var n = 0; n < 4; n++)s[n] = 16711935 & (s[n] << 8 | s[n] >>> 24) | 4278255360 & (s[n] << 24 | s[n] >>> 8), t[e + n] ^= s[n] }, blockSize: 4, ivSize: 2 }); e.RabbitLegacy = n._createHelper(h) }(), t.pad.ZeroPadding = { pad: function (t, r) { var e = 4 * r; t.clamp(), t.sigBytes += e - (t.sigBytes % e || e) }, unpad: function (t) { for (var r = t.words, e = t.sigBytes - 1; !(r[e >>> 2] >>> 24 - e % 4 * 8 & 255);)e--; t.sigBytes = e + 1 } }, t
 });
 
-const $ = new Env('京喜工厂');
-const JD_API_HOST = 'https://m.jingxi.com';
-const helpAu = true; //帮作者助力 免费拿活动
-const notify = $.isNode() ? require('./sendNotify') : '';
-let jdNotify = true;//是否关闭通知，false打开通知推送，true关闭通知推送
-const randomCount = $.isNode() ? 20 : 5;
-let tuanActiveId = ``;
-const jxOpenUrl = `openjd://virtual?params=%7B%20%22category%22:%20%22jump%22,%20%22des%22:%20%22m%22,%20%22url%22:%20%22https://wqsd.jd.com/pingou/dream_factory/index.html%22%20%7D`;
-let cookiesArr = [], cookie = '', message = '', allMessage = '';
-const inviteCodes = [
-  'V5LkjP4WRyjeCKR9VRwcRX0bBuTz7MEK0-E99EJ7u0k=@0WtCMPNq7jekehT6d3AbFw==',
-  "gB99tYLjvPcEFloDgamoBw==@7dluIKQMp0bySgcr8AqFgw==",
-  '-OvElMzqeyeGBWazWYjI1Q==',
-  'GFwo6PntxDHH95ZRzZ5uAg=='
-];
+const $ = new Env('宠汪汪积分兑换奖品');
+let allMessage = '';
+let joyRewardName = 0;//是否兑换京豆，默认0不兑换京豆，其中20为兑换20京豆,500为兑换500京豆，0为不兑换京豆.数量有限先到先得
+//Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-$.tuanIds = [];
-$.appId = 10001;
+const notify = $.isNode() ? require('./sendNotify') : '';
+let jdNotify = false;//是否开启静默运行，默认false关闭(即:奖品兑换成功后会发出通知提示)
+//IOS等用户直接用NobyDa的jd cookie
+let cookiesArr = [], cookie = '';
 if ($.isNode()) {
   Object.keys(jdCookieNode).forEach((item) => {
     cookiesArr.push(jdCookieNode[item])
   })
   if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {};
-  if (process.env.DREAMFACTORY_FORBID_ACCOUNT) process.env.DREAMFACTORY_FORBID_ACCOUNT.split('&').map((item, index) => Number(item) === 0 ? cookiesArr = [] : cookiesArr.splice(Number(item) - 1 - index, 1))
 } else {
   cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
+const JD_API_HOST = 'https://jdjoy.jd.com';
+Date.prototype.Format = function (fmt) { //author: meizz
+  var o = {
+    "M+": this.getMonth() + 1, //月份
+    "d+": this.getDate(), //日
+    "h+": this.getHours(), //小时
+    "m+": this.getMinutes(), //分
+    "s+": this.getSeconds(), //秒
+    "S": this.getMilliseconds() //毫秒
+  };
+  if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+  for (var k in o)
+    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+  return fmt;
+}
 !(async () => {
-  $.CryptoJS = $.isNode() ? require('crypto-js') : CryptoJS;
-  await requestAlgo();
-  await requireConfig();
   if (!cookiesArr[0]) {
-    $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
-    return;
+    $.msg('【京东账号一】宠汪汪积分兑换奖品失败', '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
   }
   for (let i = 0; i < cookiesArr.length; i++) {
     if (cookiesArr[i]) {
@@ -74,52 +72,24 @@ if ($.isNode()) {
       $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
       $.index = i + 1;
       $.isLogin = true;
-      $.nickName = '';
-      message = '';
-      $.ele = 0;
-      $.pickEle = 0;
-      $.pickFriendEle = 0;
-      $.friendList = [];
-      $.canHelpFlag = true;//能否助力朋友(招工)
-      $.tuanNum = 0;//成团人数
+      $.nickName = '' || $.UserName;
       await TotalBean();
-      console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
+      console.log(`\n*****开始【京东账号${$.index}】${$.nickName || $.UserName}****\n`);
       if (!$.isLogin) {
         $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
 
-        if ($.isNode()) {
-          await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
-        }
+        // if ($.isNode()) {
+        //   await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+        // }
         continue
       }
-      await jdDreamFactory()
+      // console.log(`本地时间与京东服务器时间差(毫秒)：${await get_diff_time()}`);
+      console.log(`脚本开始请求时间 ${(new Date()).Format("yyyy-MM-dd hh:mm:ss | S")}`);
+      await joyReward();
     }
   }
-  for (let i = 0; i < cookiesArr.length; i++) {
-    if (cookiesArr[i]) {
-      cookie = cookiesArr[i];
-      $.isLogin = true;
-      $.canHelp = true;//能否参团
-      await TotalBean();
-      if (!$.isLogin) {
-        continue
-      }
-      $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-      
-      if ((cookiesArr && cookiesArr.length >= ($.tuanNum || 5)) && $.canHelp) {
-        console.log(`\n账号${$.UserName} 内部相互进团\n`);
-        for (let item of $.tuanIds) {
-          console.log(`\n${$.UserName} 去参加团 ${item}`);
-          if (!$.canHelp) break;
-          await JoinTuan(item);
-          await $.wait(1000);
-        }
-      }
-      if ($.canHelp) await joinLeaderTuan();//参团
-    }
-  }
-  if ($.isNode() && allMessage) {
-    await notify.sendNotify(`${$.name}`, `${allMessage}`, { url: jxOpenUrl })
+  if ($.isNode() && allMessage && $.ctrTemp) {
+    await notify.sendNotify(`${$.name}`, `${allMessage}`)
   }
 })()
     .catch((e) => {
@@ -129,1259 +99,203 @@ if ($.isNode()) {
       $.done();
     })
 
-async function jdDreamFactory() {
+
+async function joyReward() {
   try {
-    await userInfo();
-    await QueryFriendList();//查询今日招工情况以及剩余助力次数
-    // await joinLeaderTuan();//参团
-    await helpFriends();
-    if (!$.unActive) return
-    // await collectElectricity()
-    await getUserElectricity();
-    await taskList();
-    await investElectric();
-    await QueryHireReward();//收取招工电力
-    await PickUp();//收取自家的地下零件
-    await stealFriend();
-    await tuanActivity();
-    await QueryAllTuan();
-    await exchangeProNotify();
-    await showMsg();
+    await getExchangeRewards();
+    if ($.getExchangeRewardsRes && $.getExchangeRewardsRes.success) {
+      // console.log('success', $.getExchangeRewardsRes);
+      const data = $.getExchangeRewardsRes.data;
+      // const levelSaleInfos = data.levelSaleInfos;
+      // const giftSaleInfos = levelSaleInfos.giftSaleInfos;
+      // console.log(`当前积分 ${data.coin}\n`);
+      // console.log(`宠物等级 ${data.level}\n`);
+      let saleInfoId = '', giftValue = '', extInfo = '', leftStock = 0, salePrice = 0;
+      let rewardNum = 0;
+      if ($.isNode() && process.env.JD_JOY_REWARD_NAME) {
+        rewardNum = process.env.JD_JOY_REWARD_NAME * 1;
+      } else if ($.getdata('joyRewardName')) {
+        if ($.getdata('joyRewardName') * 1 === 1) {
+          //兼容之前的BoxJs设置
+          rewardNum = 20;
+        } else {
+          rewardNum = $.getdata('joyRewardName') * 1;
+        }
+      } else {
+        rewardNum = joyRewardName;
+      }
+      let giftSaleInfos = 'beanConfigs0';
+      let time = new Date($.getExchangeRewardsRes['currentTime']).getHours();
+      if (time >= 0 && time < 8) {
+        giftSaleInfos = 'beanConfigs0';
+      }
+      if (time >= 8 && time < 16) {
+        giftSaleInfos = 'beanConfigs8';
+      }
+      if (time >= 16 && time < 24) {
+        giftSaleInfos = 'beanConfigs16';
+      }
+      console.log(`\ndebug场次:${giftSaleInfos}\n`)
+      for (let item of data[giftSaleInfos]) {
+        console.log(`${item['giftName']}当前库存:${item['leftStock']}，id：${item.id}`)
+        if (item.giftType === 'jd_bean' && item['giftValue'] === rewardNum) {
+          saleInfoId = item.id;
+          leftStock = item.leftStock;
+          salePrice = item.salePrice;
+          giftValue = item.giftValue;
+        }
+      }
+      // console.log(`${giftValue}京豆当前京豆库存:${leftStock}`)
+      // console.log(`saleInfoId:${saleInfoId}`)
+      // 兼容之前BoxJs兑换设置的数据
+      if (rewardNum && (rewardNum === 1 || rewardNum === 20 || rewardNum === 50 || rewardNum === 100 || rewardNum === 500 || rewardNum === 1000)) {
+        //开始兑换
+        if (salePrice) {
+          if (leftStock) {
+            if (!saleInfoId) return
+            // console.log(`当前账户积分:${data.coin}\n当前京豆库存:${leftStock}\n满足兑换条件,开始为您兑换京豆\n`);
+            console.log(`\n您设置的兑换${giftValue}京豆库存充足,开始为您兑换${giftValue}京豆\n`);
+            console.log(`脚本开始兑换${rewardNum}京豆时间 ${(new Date()).Format("yyyy-MM-dd hh:mm:ss | S")}`);
+            await exchange(saleInfoId, 'pet');
+            console.log(`请求兑换API后时间 ${(new Date()).Format("yyyy-MM-dd hh:mm:ss | S")}`);
+            if ($.exchangeRes && $.exchangeRes.success) {
+              if ($.exchangeRes.errorCode === 'buy_success') {
+                // console.log(`兑换${giftValue}成功,【宠物等级】${data.level}\n【消耗积分】${salePrice}个\n【剩余积分】${data.coin - salePrice}个\n`)
+                console.log(`\n兑换${giftValue}成功,【消耗积分】${salePrice}个\n`)
+                if ($.isNode() && process.env.JD_JOY_REWARD_NOTIFY) {
+                  $.ctrTemp = `${process.env.JD_JOY_REWARD_NOTIFY}` === 'false';
+                } else if ($.getdata('jdJoyRewardNotify')) {
+                  $.ctrTemp = $.getdata('jdJoyRewardNotify') === 'false';
+                } else {
+                  $.ctrTemp = `${jdNotify}` === 'false';
+                }
+                if ($.ctrTemp) {
+                  $.msg($.name, ``, `【京东账号${$.index}】${$.nickName}\n【${giftValue}京豆】兑换成功🎉\n【积分详情】消耗积分 ${salePrice}`);
+                  if ($.isNode()) {
+                    allMessage += `【京东账号${$.index}】 ${$.nickName}\n【${giftValue}京豆】兑换成功🎉\n【积分详情】消耗积分 ${salePrice}${$.index !== cookiesArr.length ? '\n\n' : ''}`
+                    // await notify.sendNotify(`${$.name} - 账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】 ${$.nickName}\n【${giftValue}京豆】兑换成功\n【宠物等级】${data.level}\n【积分详情】消耗积分 ${salePrice}, 剩余积分 ${data.coin - salePrice}`);
+                  }
+                }
+                // if ($.isNode()) {
+                //   await notify.BarkNotify(`${$.name}`, `【京东账号${$.index}】 ${$.nickName}\n【兑换${giftName}】成功\n【宠物等级】${data.level}\n【消耗积分】${salePrice}分\n【当前剩余】${data.coin - salePrice}积分`);
+                // }
+              } else if ($.exchangeRes && $.exchangeRes.errorCode === 'buy_limit') {
+                console.log(`\n兑换${rewardNum}京豆失败，原因：兑换京豆已达上限，请把机会留给更多的小伙伴~\n`)
+                //$.msg($.name, `兑换${giftName}失败`, `【京东账号${$.index}】${$.nickName}\n兑换京豆已达上限\n请把机会留给更多的小伙伴~\n`)
+              } else if ($.exchangeRes && $.exchangeRes.errorCode === 'stock_empty'){
+                console.log(`\n兑换${rewardNum}京豆失败，原因：当前京豆库存为空\n`)
+              } else if ($.exchangeRes && $.exchangeRes.errorCode === 'insufficient'){
+                console.log(`\n兑换${rewardNum}京豆失败，原因：当前账号积分不足兑换${giftValue}京豆所需的${salePrice}积分\n`)
+              } else {
+                console.log(`\n兑奖失败:${JSON.stringify($.exchangeRes)}`)
+              }
+            } else {
+              console.log(`\n兑换京豆异常:${JSON.stringify($.exchangeRes)}`)
+            }
+          } else {
+            console.log(`\n按您设置的兑换${rewardNum}京豆失败，原因：京豆库存不足，已抢完，请下一场再兑换\n`);
+          }
+        } else {
+          // console.log(`兑换${rewardNum}京豆失败，原因：您目前只有${data.coin}积分，已不足兑换${giftValue}京豆所需的${salePrice}积分\n`)
+          //$.msg($.name, `兑换${giftName}失败`, `【京东账号${$.index}】${$.nickName}\n目前只有${data.coin}积分\n已不足兑换${giftName}所需的${salePrice}积分\n`)
+        }
+      } else {
+        console.log(`\n您设置了不兑换京豆,如需兑换京豆，请去BoxJs处设置或修改joyRewardName代码或设置环境变量 JD_JOY_REWARD_NAME`)
+      }
+    } else {
+      console.log(`${$.name}getExchangeRewards异常,${JSON.stringify($.getExchangeRewardsRes)}`)
+    }
   } catch (e) {
     $.logErr(e)
   }
 }
-
-
-// 收取发电机的电力
-function collectElectricity(facId = $.factoryId, help = false, master) {
-  return new Promise(async resolve => {
-    // let url = `/dreamfactory/generator/CollectCurrentElectricity?zone=dream_factory&apptoken=&pgtimestamp=&phoneID=&factoryid=${facId}&doubleflag=1&sceneval=2&g_login_type=1`;
-    // if (help && master) {
-    //   url = `/dreamfactory/generator/CollectCurrentElectricity?zone=dream_factory&factoryid=${facId}&master=${master}&sceneval=2&g_login_type=1`;
-    // }
-    let body = `factoryid=${facId}&apptoken=&pgtimestamp=&phoneID=&doubleflag=1`;
-    if (help && master) {
-      body += `factoryid=${facId}&master=${master}`;
-    }
-    $.get(taskurl(`generator/CollectCurrentElectricity`, body, `_time,apptoken,doubleflag,factoryid,pgtimestamp,phoneID,timeStamp,zone`), (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              if (help) {
-                $.ele += Number(data.data['loginPinCollectElectricity'])
-                console.log(`帮助好友收取 ${data.data['CollectElectricity']} 电力，获得 ${data.data['loginPinCollectElectricity']} 电力`);
-                message += `【帮助好友】帮助成功，获得 ${data.data['loginPinCollectElectricity']} 电力\n`
-              } else {
-                $.ele += Number(data.data['CollectElectricity'])
-                console.log(`收取电力成功: 共${data.data['CollectElectricity']} `);
-                message += `【收取发电站】收取成功，获得 ${data.data['CollectElectricity']} 电力\n`
-              }
-            } else {
-              if (help) {
-                console.log(`收取好友电力失败:${data.msg}\n`);
-              } else {
-                console.log(`收取电力失败:${data.msg}\n`);
-              }
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-
-// 投入电力
-function investElectric() {
-  return new Promise(async resolve => {
-    // const url = `/dreamfactory/userinfo/InvestElectric?zone=dream_factory&productionId=${$.productionId}&sceneval=2&g_login_type=1`;
-    $.get(taskurl('userinfo/InvestElectric', `productionId=${$.productionId}`, `_time,productionId,zone`), (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data.ret === 0) {
-              console.log(`成功投入电力${data.data.investElectric}电力`);
-              message += `【投入电力】投入成功，共计 ${data.data.investElectric} 电力\n`;
-            } else {
-              console.log(`投入失败，${data.msg}`);
-              message += `【投入电力】投入失败，${data.msg}\n`;
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-
-// 初始化任务
-function taskList() {
-  return new Promise(async resolve => {
-    // const url = `/newtasksys/newtasksys_front/GetUserTaskStatusList?source=dreamfactory&bizCode=dream_factory&sceneval=2&g_login_type=1`;
-    $.get(newtasksysUrl('GetUserTaskStatusList', '', `_time,bizCode,source`), async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            let userTaskStatusList = data['data']['userTaskStatusList'];
-            for (let i = 0; i < userTaskStatusList.length; i++) {
-              const vo = userTaskStatusList[i];
-              if (vo['awardStatus'] !== 1) {
-                if (vo.completedTimes >= vo.targetTimes) {
-                  console.log(`任务：${vo.description}可完成`)
-                  await completeTask(vo.taskId, vo.taskName)
-                  await $.wait(1000);//延迟等待一秒
-                } else {
-                  switch (vo.taskType) {
-                    case 2: // 逛一逛任务
-                    case 6: // 浏览商品任务
-                    case 9: // 开宝箱
-                      for (let i = vo.completedTimes; i <= vo.configTargetTimes; ++i) {
-                        console.log(`去做任务：${vo.taskName}`)
-                        await doTask(vo.taskId)
-                        await completeTask(vo.taskId, vo.taskName)
-                        await $.wait(1000);//延迟等待一秒
-                      }
-                      break
-                    case 4: // 招工
-                      break
-                    case 5:
-                      // 收集类
-                      break
-                    case 1: // 登陆领奖
-                    default:
-                      break
-                  }
-                }
-              }
-            }
-            console.log(`完成任务：共领取${$.ele}电力`)
-            message += `【每日任务】领奖成功，共计 ${$.ele} 电力\n`;
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-
-// 获得用户电力情况
-function getUserElectricity() {
-  return new Promise(async resolve => {
-    // const url = `/dreamfactory/generator/QueryCurrentElectricityQuantity?zone=dream_factory&factoryid=${$.factoryId}&sceneval=2&g_login_type=1`
-    $.get(taskurl(`generator/QueryCurrentElectricityQuantity`, `factoryid=${$.factoryId}`, `_time,factoryid,zone`), async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              console.log(`发电机：当前 ${data.data.currentElectricityQuantity} 电力，最大值 ${data.data.maxElectricityQuantity} 电力`)
-              if (data.data.currentElectricityQuantity < data.data.maxElectricityQuantity) {
-                $.log(`\n本次发电机电力集满分享后${data.data.nextCollectDoubleFlag === 1 ? '可' : '不可'}获得双倍电力，${data.data.nextCollectDoubleFlag === 1 ? '故目前不收取电力' : '故现在收取电力'}\n`)
-              }
-              if (data.data.nextCollectDoubleFlag === 1) {
-                if (data.data.currentElectricityQuantity === data.data.maxElectricityQuantity && data.data.doubleElectricityFlag) {
-                  console.log(`发电机：电力可翻倍并收获`)
-                  // await shareReport();
-                  await collectElectricity()
-                } else {
-                  message += `【发电机电力】当前 ${data.data.currentElectricityQuantity} 电力，未达到收获标准\n`
-                }
-              } else {
-                //再收取双倍电力达到上限时，直接收取，不再等到满级
-                await collectElectricity()
-              }
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-
-//查询有多少的招工电力可收取
-function QueryHireReward() {
-  return new Promise(async resolve => {
-    // const url = `/dreamfactory/friend/HireAward?zone=dream_factory&date=${new Date().Format("yyyyMMdd")}&type=0&sceneval=2&g_login_type=1`
-    $.get(taskurl('friend/QueryHireReward', ``, `_time,zone`), async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              for (let item of data['data']['hireReward']) {
-                if (item.date !== new Date(new Date().getTime() + new Date().getTimezoneOffset()*60*1000 + 8*60*60*1000).Format("yyyyMMdd")) {
-                  await hireAward(item.date, item.type);
-                }
-              }
-            } else {
-              console.log(`异常：${JSON.stringify(data)}`)
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-// 收取招工/劳模电力
-function hireAward(date, type = 0) {
-  return new Promise(async resolve => {
-    // const url = `/dreamfactory/friend/HireAward?zone=dream_factory&date=${new Date().Format("yyyyMMdd")}&type=0&sceneval=2&g_login_type=1`
-    $.get(taskurl('friend/HireAward', `date=${date}&type=${type}`, '_time,date,type,zone'), async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              console.log(`打工电力：收取成功`)
-              message += `【打工电力】：收取成功\n`
-            } else {
-              console.log(`打工电力：收取失败，${data.msg}`)
-              message += `【打工电力】收取失败，${data.msg}\n`
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-async function helpFriends() {
-  let Hours = new Date(new Date().getTime() + new Date().getTimezoneOffset()*60*1000 + 8*60*60*1000).getHours();
-  if (Hours < 6) {
-    console.log(`\n未到招工时间(每日6-24点之间可招工)\n`)
-    return
+function getExchangeRewards() {
+  let opt = {
+    url: "//jdjoy.jd.com/common/gift/getBeanConfigs?reqSource=h5&invokeKey=Oex5GmEuqGep1WLC",
+    method: "GET",
+    data: {},
+    credentials: "include",
+    header: {"content-type": "application/json"}
   }
-  if ($.canHelpFlag) {
-    await shareCodesFormat();
-    for (let code of $.newShareCodes) {
-      if (code) {
-        if ($.encryptPin === code) {
-          console.log(`不能为自己助力,跳过`);
-          continue;
-        }
-        const assistFriendRes = await assistFriend(code);
-        if (assistFriendRes && assistFriendRes['ret'] === 0) {
-          console.log(`助力朋友：${code}成功，因一次只能助力一个，故跳出助力`)
-          break
-        } else if (assistFriendRes && assistFriendRes['ret'] === 11009) {
-          console.log(`助力朋友[${code}]失败：${assistFriendRes.msg}，跳出助力`);
-          break
-        } else {
-          console.log(`助力朋友[${code}]失败：${assistFriendRes.msg}`)
-        }
-      }
-    }
-  } else {
-    $.log(`\n今日助力好友机会已耗尽\n`);
-  }
-}
-// 帮助用户,此处UA不可更换,否则助力功能会失效
-function assistFriend(sharepin) {
-  return new Promise(async resolve => {
-    // const url = `/dreamfactory/friend/AssistFriend?zone=dream_factory&sharepin=${escape(sharepin)}&sceneval=2&g_login_type=1`
-    // const options = {
-    //   'url': `https://m.jingxi.com/dreamfactory/friend/AssistFriend?zone=dream_factory&sharepin=${escape(sharepin)}&sceneval=2&g_login_type=1`,
-    //   'headers': {
-    //     "Accept": "*/*",
-    //     "Accept-Encoding": "gzip, deflate, br",
-    //     "Accept-Language": "zh-cn",
-    //     "Connection": "keep-alive",
-    //     "Cookie": cookie,
-    //     "Host": "m.jingxi.com",
-    //     "Referer": "https://st.jingxi.com/pingou/dream_factory/index.html",
-    //     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36"
-    //   }
-    // }
-    const options = taskurl('friend/AssistFriend', `sharepin=${escape(sharepin)}`, `_time,sharepin,zone`);
-    $.get(options, (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            // if (data['ret'] === 0) {
-            //   console.log(`助力朋友：${sharepin}成功`)
-            // } else {
-            //   console.log(`助力朋友[${sharepin}]失败：${data.msg}`)
-            // }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve(data);
-      }
-    })
-  })
-}
-//查询助力招工情况
-function QueryFriendList() {
-  return new Promise(async resolve => {
-    $.get(taskurl('friend/QueryFriendList', ``, `_time,zone`), (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              data = data['data'];
-              const { assistListToday = [], assistNumMax, hireListToday = [], hireNumMax } = data;
-              console.log(`\n\n你今日还能帮好友打工（${assistNumMax - assistListToday.length || 0}/${assistNumMax}）次\n\n`);
-              if (assistListToday.length === assistNumMax) {
-                $.canHelpFlag = false;
-              }
-              $.log(`【今日招工进度】${hireListToday.length}/${hireNumMax}`);
-              message += `【招工进度】${hireListToday.length}/${hireNumMax}\n`;
-            } else {
-              console.log(`QueryFriendList异常：${JSON.stringify(data)}`)
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-// 任务领奖
-function completeTask(taskId, taskName) {
-  return new Promise(async resolve => {
-    // const url = `/newtasksys/newtasksys_front/Award?source=dreamfactory&bizCode=dream_factory&taskId=${taskId}&sceneval=2&g_login_type=1`;
-    $.get(newtasksysUrl('Award', taskId, `_time,bizCode,source,taskId`), (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            switch (data['data']['awardStatus']) {
-              case 1:
-                $.ele += Number(data['data']['prizeInfo'].replace('\\n', ''))
-                console.log(`领取${taskName}任务奖励成功，收获：${Number(data['data']['prizeInfo'].replace('\\n', ''))}电力`);
-                break
-              case 1013:
-              case 0:
-                console.log(`领取${taskName}任务奖励失败，任务已领奖`);
-                break
-              default:
-                console.log(`领取${taskName}任务奖励失败，${data['msg']}`)
-                break
-            }
-            // if (data['ret'] === 0) {
-            //   console.log("做任务完成！")
-            // } else {
-            //   console.log(`异常：${JSON.stringify(data)}`)
-            // }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-
-// 完成任务
-function doTask(taskId) {
-  return new Promise(async resolve => {
-    // const url = `/newtasksys/newtasksys_front/DoTask?source=dreamfactory&bizCode=dream_factory&taskId=${taskId}&sceneval=2&g_login_type=1`;
-    $.get(newtasksysUrl('DoTask', taskId, '_time,bizCode,configExtra,source,taskId'), (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              console.log("做任务完成！")
-            } else {
-              console.log(`DoTask异常：${JSON.stringify(data)}`)
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-
-// 初始化个人信息
-function userInfo() {
-  return new Promise(async resolve => {
-    $.get(taskurl('userinfo/GetUserInfo', `pin=&sharePin=&shareType=&materialTuanPin=&materialTuanId=&source=`, '_time,materialTuanId,materialTuanPin,pin,sharePin,shareType,source,zone'), async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              data = data['data'];
-              $.unActive = true;//标记是否开启了京喜活动或者选购了商品进行生产
-              $.encryptPin = '';
-              $.shelvesList = [];
-              if (data.factoryList && data.productionList) {
-                const production = data.productionList[0];
-                const factory = data.factoryList[0];
-                const productionStage = data.productionStage;
-                $.factoryId = factory.factoryId;//工厂ID
-                $.productionId = production.productionId;//商品ID
-                $.commodityDimId = production.commodityDimId;
-                $.encryptPin = data.user.encryptPin;
-                // subTitle = data.user.pin;
-                await GetCommodityDetails();//获取已选购的商品信息
-                if (productionStage['productionStageAwardStatus'] === 1) {
-                  $.log(`可以开红包了\n`);
-                  await DrawProductionStagePrize();//领取红包
-                } else {
-                  $.log(`再加${productionStage['productionStageProgress']}电力可开红包\n`)
-                }
-                console.log(`当前电力：${data.user.electric}`)
-                console.log(`当前等级：${data.user.currentLevel}`)
-                console.log(`\n【京东账号${$.index}（${$.UserName}）的${$.name}好友互助码】${data.user.encryptPin}`);
-                console.log(`已投入电力：${production.investedElectric}`);
-                console.log(`所需电力：${production.needElectric}`);
-                console.log(`生产进度：${((production.investedElectric / production.needElectric) * 100).toFixed(2)}%`);
-                message += `【京东账号${$.index}】${$.nickName}\n`
-                message += `【生产商品】${$.productName}\n`;
-                message += `【当前等级】${data.user.userIdentity} ${data.user.currentLevel}\n`;
-                message += `【生产进度】${((production.investedElectric / production.needElectric) * 100).toFixed(2)}%\n`;
-                if (production.investedElectric >= production.needElectric) {
-                  if (production['exchangeStatus'] === 1) $.log(`\n\n可以兑换商品了`)
-                  if (production['exchangeStatus'] === 3) {
-                    $.log(`\n\n商品兑换已超时`)
-                    if (new Date().getHours() === 9) {
-                      $.msg($.name, '', `【京东账号${$.index}】${$.nickName}\n【生产商品】${$.productName}兑换已超时，请选择新商品进行制造`)
-                      allMessage += `【京东账号${$.index}】${$.nickName}\n【生产商品】${$.productName}兑换已超时，请选择新商品进行制造${$.index !== cookiesArr.length ? '\n\n' : ''}`;
-                    }
-                  }
-                  // await exchangeProNotify()
-                } else {
-                  console.log(`\n\n预计最快还需 【${((production.needElectric - production.investedElectric) / (2 * 60 * 60 * 24)).toFixed(2)}天】生产完毕\n\n`)
-                }
-              } else {
-                $.unActive = false;//标记是否开启了京喜活动或者选购了商品进行生产
-                if (!data.factoryList) {
-                  console.log(`【提示】京东账号${$.index}[${$.nickName}]京喜工厂活动未开始\n请手动去京东APP->游戏与互动->查看更多->京喜工厂 开启活动\n`);
-                  // $.msg($.name, '【提示】', `京东账号${$.index}[${$.nickName}]京喜工厂活动未开始\n请手动去京东APP->游戏与互动->查看更多->京喜工厂 开启活动`);
-                } else if (data.factoryList && !data.productionList) {
-                  console.log(`【提示】京东账号${$.index}[${$.nickName}]京喜工厂未选购商品\n请手动去京东APP->游戏与互动->查看更多->京喜工厂 选购\n`)
-                  let nowTimes = new Date(new Date().getTime() + new Date().getTimezoneOffset()*60*1000 + 8*60*60*1000);
-                  if (nowTimes.getHours()  === 12) {
-                    //如按每小时运行一次，则此处将一天12点推送1次提醒
-                    $.msg($.name, '提醒⏰', `京东账号${$.index}[${$.nickName}]京喜工厂未选择商品\n请手动去京东APP->游戏与互动->查看更多->京喜工厂 选择商品`);
-                    // if ($.isNode()) await notify.sendNotify(`${$.name} - 京东账号${$.index} - ${$.nickName}`, `京东账号${$.index}[${$.nickName}]京喜工厂未选择商品\n请手动去京东APP->游戏与互动->查看更多->京喜工厂 选择商品`)
-                    if ($.isNode()) allMessage += `京东账号${$.index}[${$.nickName}]京喜工厂未选择商品\n请手动去京东APP->游戏与互动->查看更多->京喜工厂 选择商品${$.index !== cookiesArr.length ? '\n\n' : ''}`
-                  }
-                }
-              }
-            } else {
-              console.log(`GetUserInfo异常：${JSON.stringify(data)}`)
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-//查询当前生产的商品名称
-function GetCommodityDetails() {
-  return new Promise(async resolve => {
-    // const url = `/dreamfactory/diminfo/GetCommodityDetails?zone=dream_factory&sceneval=2&g_login_type=1&commodityId=${$.commodityDimId}`;
-    $.get(taskurl('diminfo/GetCommodityDetails', `commodityId=${$.commodityDimId}`, `_time,commodityId,zone`), (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              data = data['data'];
-              $.productName = data['commodityList'][0].name;
-            } else {
-              console.log(`GetCommodityDetails异常：${JSON.stringify(data)}`)
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-// 查询已完成商品
-function GetShelvesList(pageNo = 1) {
-  return new Promise(async resolve => {
-    $.get(taskurl('userinfo/GetShelvesList', `pageNo=${pageNo}&pageSize=12`, `_time,pageNo,pageSize,zone`), (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              data = data['data'];
-              const { shelvesList } = data;
-              if (shelvesList) {
-                $.shelvesList = [...$.shelvesList, ...shelvesList];
-                pageNo ++
-                GetShelvesList(pageNo);
-              }
-            } else {
-              console.log(`GetShelvesList异常：${JSON.stringify(data)}`)
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-//领取红包
-function DrawProductionStagePrize() {
-  return new Promise(async resolve => {
-    // const url = `/dreamfactory/userinfo/DrawProductionStagePrize?zone=dream_factory&sceneval=2&g_login_type=1&productionId=${$.productionId}`;
-    $.get(taskurl('userinfo/DrawProductionStagePrize', `productionId=${$.productionId}`, `_time,productionId,zone`), (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          console.log(`开幸运红包：${data}`);
-          // if (safeGet(data)) {
-          //   data = JSON.parse(data);
-          //   if (data['ret'] === 0) {
-          //
-          //   } else {
-          //     console.log(`异常：${JSON.stringify(data)}`)
-          //   }
-          // }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-async function PickUp(encryptPin = $.encryptPin, help = false) {
-  $.pickUpMyselfComponent = true;
-  const GetUserComponentRes = await GetUserComponent(encryptPin, 1500);
-  if (GetUserComponentRes && GetUserComponentRes['ret'] === 0 && GetUserComponentRes['data']) {
-    const { componentList } = GetUserComponentRes['data'];
-    if (componentList && componentList.length <= 0) {
-      if (help) {
-        $.log(`好友【${encryptPin}】地下暂无零件可收\n`)
-      } else {
-        $.log(`自家地下暂无零件可收\n`)
-      }
-      $.pickUpMyselfComponent = false;
-    }
-    for (let item of componentList) {
-      await $.wait(1000);
-      const PickUpComponentRes = await PickUpComponent(item['placeId'], encryptPin);
-      if (PickUpComponentRes) {
-        if (PickUpComponentRes['ret'] === 0) {
-          const data = PickUpComponentRes['data'];
-          if (help) {
-            console.log(`收取好友[${encryptPin}]零件成功:获得${data['increaseElectric']}电力\n`);
-            $.pickFriendEle += data['increaseElectric'];
-          } else {
-            console.log(`收取自家零件成功:获得${data['increaseElectric']}电力\n`);
-            $.pickEle += data['increaseElectric'];
-          }
-        } else {
-          if (help) {
-            console.log(`收好友[${encryptPin}]零件失败：${PickUpComponentRes.msg},直接跳出\n`)
-          } else {
-            console.log(`收自己地下零件失败：${PickUpComponentRes.msg},直接跳出\n`);
-            $.pickUpMyselfComponent = false;
-          }
-          break
-        }
-      }
-    }
-  }
-}
-function GetUserComponent(pin = $.encryptPin, timeout = 0) {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      $.get(taskurl('usermaterial/GetUserComponent', `pin=${pin}`, `_time,pin,zone`), (err, resp, data) => {
-        try {
-          if (err) {
-            console.log(`${JSON.stringify(err)}`)
-            console.log(`${$.name} API请求失败，请检查网路重试`)
-          } else {
-            if (safeGet(data)) {
-              data = JSON.parse(data);
-              if (data['ret'] === 0) {
-
-              } else {
-                console.log(`GetUserComponent失败：${JSON.stringify(data)}`)
-              }
-            }
-          }
-        } catch (e) {
-          $.logErr(e, resp)
-        } finally {
-          resolve(data);
-        }
-      })
-    }, timeout)
-  })
-}
-//收取地下随机零件电力API
-
-function PickUpComponent(index, encryptPin) {
-  return new Promise(resolve => {
-    $.get(taskurl('usermaterial/PickUpComponent', `placeId=${index}&pin=${encryptPin}`, `_time,pin,placeId,zone`), (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            // if (data['ret'] === 0) {
-            //   data = data['data'];
-            //   if (help) {
-            //     console.log(`收取好友[${encryptPin}]零件成功:获得${data['increaseElectric']}电力\n`);
-            //     $.pickFriendEle += data['increaseElectric'];
-            //   } else {
-            //     console.log(`收取自家零件成功:获得${data['increaseElectric']}电力\n`);
-            //     $.pickEle += data['increaseElectric'];
-            //   }
-            // } else {
-            //   if (help) {
-            //     console.log(`收好友[${encryptPin}]零件失败：${JSON.stringify(data)}`)
-            //   } else {
-            //     console.log(`收零件失败：${JSON.stringify(data)}`)
-            //   }
-            // }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve(data);
-      }
-    })
-  })
-}
-//偷好友的电力
-async function stealFriend() {
-  // if (!$.pickUpMyselfComponent) {
-  //   $.log(`今日收取零件已达上限，偷好友零件也达到上限，故跳出`)
-  //   return
-  // }
-  //调整，只在每日1点，12点，19点尝试收取好友零件
-  if (new Date().getHours() !== 1 && new Date().getHours() !== 12 && new Date().getHours() !== 19) return
-  await getFriendList();
-  $.friendList = [...new Set($.friendList)].filter(vo => !!vo && vo['newFlag'] !== 1);
-  console.log(`查询好友列表完成，共${$.friendList.length}好友，下面开始拾取好友地下的零件\n`);
-  for (let i = 0; i < $.friendList.length; i++) {
-    let pin = $.friendList[i]['encryptPin'];//好友的encryptPin
-    console.log(`\n开始收取第 ${i + 1} 个好友 【${$.friendList[i]['nickName']}】 地下零件 collectFlag：${$.friendList[i]['collectFlag']}`)
-    await PickUp(pin, true);
-    // await getFactoryIdByPin(pin);//获取好友工厂ID
-    // if ($.stealFactoryId) await collectElectricity($.stealFactoryId,true, pin);
-  }
-}
-function getFriendList(sort = 0) {
-  return new Promise(async resolve => {
-    $.get(taskurl('friend/QueryFactoryManagerList', `sort=${sort}`, `_time,sort,zone`), async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              data = data['data'];
-              if (data.list && data.list.length <= 0) {
-                // console.log(`查询好友列表完成，共${$.friendList.length}好友，下面开始拾取好友地下的零件\n`);
-                return
-              }
-              let friendsEncryptPins = [];
-              for (let item of data.list) {
-                friendsEncryptPins.push(item);
-              }
-              $.friendList = [...$.friendList, ...friendsEncryptPins];
-              // if (!$.isNode()) return
-              await getFriendList(data.sort);
-            } else {
-              console.log(`QueryFactoryManagerList异常：${JSON.stringify(data)}`)
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-function getFactoryIdByPin(pin) {
-  return new Promise((resolve, reject) => {
-    // const url = `/dreamfactory/userinfo/GetUserInfoByPin?zone=dream_factory&pin=${pin}&sceneval=2`;
-    $.get(taskurl('userinfo/GetUserInfoByPin', `pin=${pin}`), (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              if (data.data.factoryList) {
-                //做此判断,有时候返回factoryList为null
-                // resolve(data['data']['factoryList'][0]['factoryId'])
-                $.stealFactoryId = data['data']['factoryList'][0]['factoryId'];
-              }
-            } else {
-              console.log(`异常：${JSON.stringify(data)}`)
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-async function tuanActivity() {
-  const tuanConfig = await QueryActiveConfig();
-  if (tuanConfig && tuanConfig.ret === 0) {
-    const { activeId, surplusOpenTuanNum, tuanId } = tuanConfig['data']['userTuanInfo'];
-    console.log(`今日剩余开团次数：${surplusOpenTuanNum}次`);
-    $.surplusOpenTuanNum = surplusOpenTuanNum;
-    if (!tuanId && surplusOpenTuanNum > 0) {
-      //开团
-      $.log(`准备开团`)
-      await CreateTuan();
-    } else if (tuanId) {
-      //查询词团信息
-      const QueryTuanRes = await QueryTuan(activeId, tuanId);
-      if (QueryTuanRes && QueryTuanRes.ret === 0) {
-        const { tuanInfo } = QueryTuanRes.data;
-        if ((tuanInfo && tuanInfo[0]['endTime']) <= QueryTuanRes['nowTime'] && surplusOpenTuanNum > 0) {
-          $.log(`之前的团已过期，准备重新开团\n`)
-          await CreateTuan();
-        }
-        for (let item of tuanInfo) {
-          const { realTuanNum, tuanNum, userInfo } = item;
-          $.tuanNum = tuanNum || 0;
-          $.log(`\n开团情况:${realTuanNum}/${tuanNum}\n`);
-          if (realTuanNum === tuanNum) {
-            for (let user of userInfo) {
-              if (user.encryptPin === $.encryptPin) {
-                if (user.receiveElectric && user.receiveElectric > 0) {
-                  console.log(`您在${new Date(user.joinTime * 1000).toLocaleString()}开团奖励已经领取成功\n`)
-                  if ($.surplusOpenTuanNum > 0) await CreateTuan();
-                } else {
-                  $.log(`开始领取开团奖励`);
-                  await tuanAward(item.tuanActiveId, item.tuanId);//isTuanLeader
-                }
-              }
-            }
-          } else {
-            $.tuanIds.push(tuanId);
-            $.log(`\n此团未达领取团奖励人数：${tuanNum}人\n`)
-          }
-        }
-      }
-    }
-  }
-}
-async function joinLeaderTuan() {
-  let res = await updateTuanIdsCDN(), res2 = await updateTuanIdsCDN("http://cdn.annnibb.me/factory.json")
-  if (!res) res = await updateTuanIdsCDN('https://cdn.jsdelivr.net/gh/gitupdate/updateTeam@master/shareCodes/jd_updateFactoryTuanId.json');
-  $.authorTuanIds = [...(res && res.tuanIds || []),...(res2 && res2.tuanIds || [])]
-  if ($.authorTuanIds && $.authorTuanIds.length) {
-    for (let tuanId of $.authorTuanIds) {
-      if (!tuanId) continue
-      if (!$.canHelp) break;
-      console.log(`\n账号${$.UserName} 参加作者lxk0301的团 【${tuanId}】`);
-      await JoinTuan(tuanId);
-      await $.wait(1000);
-    }
-  }
-}
-//可获取开团后的团ID，如果团ID为空并且surplusOpenTuanNum>0，则可继续开团
-//如果团ID不为空，则查询QueryTuan()
-function QueryActiveConfig() {
   return new Promise((resolve) => {
-    const body = `activeId=${escape(tuanActiveId)}&tuanId=`;
-    const options = taskTuanUrl(`QueryActiveConfig`, body, `_time,activeId,tuanId`)
-    $.get(options, async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`);
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              const { userTuanInfo } = data['data'];
-              console.log(`\n团活动ID  ${userTuanInfo.activeId}`);
-              console.log(`团ID  ${userTuanInfo.tuanId}\n`);
-            } else {
-              console.log(`QueryActiveConfig异常：${JSON.stringify(data)}`);
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve(data);
-      }
-    })
-  })
-}
-function QueryTuan(activeId, tuanId) {
-  return new Promise((resolve) => {
-    const body = `activeId=${escape(activeId)}&tuanId=${escape(tuanId)}`;
-    const options = taskTuanUrl(`QueryTuan`, body, `_time,activeId,tuanId`)
-    $.get(options, async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`);
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              // $.log(`\n开团情况:${data.data.tuanInfo.realTuanNum}/${data.data.tuanInfo.tuanNum}\n`)
-            } else {
-              console.log(`异常：${JSON.stringify(data)}`);
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve(data);
-      }
-    })
-  })
-}
-//开团API
-function CreateTuan() {
-  return new Promise((resolve) => {
-    const body =`activeId=${escape(tuanActiveId)}&isOpenApp=1`
-    const options = taskTuanUrl(`CreateTuan`, body, '_time,activeId,isOpenApp')
-    $.get(options, async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`);
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              console.log(`【开团成功】tuanId为 ${data.data['tuanId']}`);
-              $.tuanIds.push(data.data['tuanId']);
-            } else {
-              //{"msg":"活动已结束，请稍后再试~","nowTime":1621551005,"ret":10218}
-              if (data['ret'] === 10218 && ($.index === 1 || cookiesArr.length === $.index)) {
-                //$.msg($.name, '', `京喜工厂拼团瓜分电力活动团ID（activeId）已失效\n请自行抓包替换(Node环境变量为TUAN_ACTIVEID，iOS端在BoxJx)或者联系作者等待更新`);
-                //if ($.isNode()) await notify.sendNotify($.name, `京喜工厂拼团瓜分电力活动团ID（activeId）已失效\n请自行抓包替换(Node环境变量为TUAN_ACTIVEID，iOS端在BoxJx)或者联系作者等待更新`)
-              }
-              console.log(`开团异常：${JSON.stringify(data)}`);
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-
-function JoinTuan(tuanId, stk = '_time,activeId,tuanId') {
-  return new Promise((resolve) => {
-    const body = `activeId=${escape(tuanActiveId)}&tuanId=${escape(tuanId)}`;
-    const options = taskTuanUrl(`JoinTuan`, body, '_time,activeId,tuanId')
-    $.get(options, async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`);
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              console.log(`参团成功：${JSON.stringify(data)}\n`);
-            } else if (data['ret'] === 10005 || data['ret'] === 10206) {
-              //火爆，或者今日参团机会已耗尽
-              console.log(`参团失败：${JSON.stringify(data)}\n`);
-              $.canHelp = false;
-            } else {
-              console.log(`参团失败：${JSON.stringify(data)}\n`);
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-//查询所有的团情况(自己开团以及参加别人的团)
-function QueryAllTuan() {
-  return new Promise((resolve) => {
-    const body = `activeId=${escape(tuanActiveId)}&pageNo=1&pageSize=10`;
-    const options = taskTuanUrl(`QueryAllTuan`, body, '_time,activeId,pageNo,pageSize')
-    $.get(options, async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`);
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              const { tuanInfo } = data;
-              for (let item of tuanInfo) {
-                if (item.tuanNum === item.realTuanNum) {
-                  // console.log(`参加团主【${item.tuanLeader}】已成功`)
-                  const { userInfo } = item;
-                  for (let item2 of userInfo) {
-                    if (item2.encryptPin === $.encryptPin) {
-                      if (item2.receiveElectric && item2.receiveElectric > 0) {
-                        console.log(`${new Date(item2.joinTime * 1000).toLocaleString()}参加团主【${item2.nickName}】的奖励已经领取成功`)
-                      } else {
-                        console.log(`开始领取${new Date(item2.joinTime * 1000).toLocaleString()}参加团主【${item2.nickName}】的奖励`)
-                        await tuanAward(item.tuanActiveId, item.tuanId, item.tuanLeader === $.encryptPin);//isTuanLeader
-                      }
-                    }
-                  }
-                } else {
-                  console.log(`${new Date(item.beginTime * 1000).toLocaleString()}参加团主【${item.tuanLeader}】失败`)
-                }
-              }
-            } else {
-              console.log(`QueryAllTuan异常：${JSON.stringify(data)}`);
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve(data);
-      }
-    })
-  })
-}
-//开团人的领取奖励API
-function tuanAward(activeId, tuanId, isTuanLeader = true) {
-  return new Promise((resolve) => {
-    const body = `activeId=${escape(activeId)}&tuanId=${escape(tuanId)}`;
-    const options = taskTuanUrl(`Award`, body, '_time,activeId,tuanId')
-    $.get(options, async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`);
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data);
-            if (data['ret'] === 0) {
-              if (isTuanLeader) {
-                console.log(`开团奖励(团长)${data.data['electric']}领取成功`);
-                message += `【开团(团长)奖励】${data.data['electric']}领取成功\n`;
-                if ($.surplusOpenTuanNum > 0) {
-                  $.log(`开团奖励(团长)已领取，准备开团`);
-                  await CreateTuan();
-                }
-              } else {
-                console.log(`参团奖励${data.data['electric']}领取成功`);
-                message += `【参团奖励】${data.data['electric']}领取成功\n`;
-              }
-            } else if (data['ret'] === 10212) {
-              console.log(`${JSON.stringify(data)}`);
-
-              if (isTuanLeader && $.surplusOpenTuanNum > 0) {
-                $.log(`团奖励已领取，准备开团`);
-                await CreateTuan();
-              }
-            } else {
-              console.log(`异常：${JSON.stringify(data)}`);
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-
-function updateTuanIdsCDN(url = 'https://raw.githubusercontent.com/gitupdate/updateTeam/master/shareCodes/jd_updateFactoryTuanId.json') {
-  return new Promise(async resolve => {
-    const options = {
-      url: `${url}?${new Date()}`, "timeout": 10000, headers: {
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/87.0.4280.88"
-      }
-    };
-    if ($.isNode() && process.env.TG_PROXY_HOST && process.env.TG_PROXY_PORT) {
-      const tunnel = require("tunnel");
-      const agent = {
-        https: tunnel.httpsOverHttp({
-          proxy: {
-            host: process.env.TG_PROXY_HOST,
-            port: process.env.TG_PROXY_PORT * 1
-          }
-        })
-      }
-      Object.assign(options, { agent })
+    const option = {
+      url: "https:"+ taroRequest(opt)['url'],
+      headers: {
+        "Host": "jdjoy.jd.com",
+        "Content-Type": "application/json",
+        "Cookie": cookie,
+        "reqSource": "h5",
+        "Connection": "keep-alive",
+        "Accept": "*/*",
+        "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
+        "Referer": "https://jdjoy.jd.com/pet/index",
+        "Accept-Language": "zh-cn",
+        "Accept-Encoding": "gzip, deflate, br"
+      },
     }
-    $.get(options, (err, resp, data) => {
-      try {
-        if (err) {
-          // console.log(`${JSON.stringify(err)}`)
-        } else {
-          if (safeGet(data)) {
-            $.tuanConfigs = data = JSON.parse(data);
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve(data);
-      }
-    })
-    await $.wait(20000)
-    resolve();
-  })
-}
-
-//商品可兑换时的通知
-async function exchangeProNotify() {
-  await GetShelvesList();
-  let exchangeEndTime, exchangeEndHours, nowHours;
-  //脚本运行的UTC+8时区的时间戳
-  let nowTimes = new Date(new Date().getTime() + new Date().getTimezoneOffset()*60*1000 + 8*60*60*1000);
-  if ($.shelvesList && $.shelvesList.length > 0) console.log(`\n  商品名     兑换状态`)
-  for (let shel of $.shelvesList) {
-    console.log(`${shel['name']}    ${shel['exchangeStatus'] === 1 ? '未兑换' : shel['exchangeStatus'] === 2 ? '已兑换' : '兑换超时'}`)
-    if (shel['exchangeStatus'] === 1) {
-      exchangeEndTime = shel['exchangeEndTime'] * 1000;
-      $.picture = shel['picture'];
-      // 兑换截止时间点
-      exchangeEndHours = new Date(exchangeEndTime + new Date().getTimezoneOffset()*60*1000 + 8*60*60*1000).getHours();
-      //兑换截止时间(年月日 时分秒)
-      $.exchangeEndTime = new Date(exchangeEndTime + new Date().getTimezoneOffset()*60*1000 + 8*60*60*1000).toLocaleString('zh', {hour12: false});
-      //脚本运行此时的时间点
-      nowHours = nowTimes.getHours();
-    } else if (shel['exchangeStatus'] === 3) {
-      //兑换超时
-    }
-  }
-  if (exchangeEndTime) {
-    //比如兑换(超时)截止时间是2020/12/8 09:20:04,现在时间是2020/12/6
-    if (nowTimes < exchangeEndTime) {
-      // 一:在兑换超时这一天(2020/12/8 09:20:04)的前3小时内通知（每次运行都通知）
-      let flag = true;
-      if ((exchangeEndTime - nowTimes.getTime()) <= 3600000 * 3) {
-        let expiredTime = parseFloat(((exchangeEndTime - nowTimes.getTime()) / (60*60*1000)).toFixed(1))
-        $.msg($.name, ``, `【京东账号${$.index}】${$.nickName}\n【生产商品】${$.productName}${expiredTime}小时后兑换超时\n【兑换截止时间】${$.exchangeEndTime}\n请速去京喜APP->首页->好物0元造进行兑换`, {'open-url': jxOpenUrl, 'media-url': $.picture})
-        // if ($.isNode()) await notify.sendNotify(`${$.name} - 京东账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】${$.nickName}\n【生产商品】${$.productName}${(exchangeEndTime - nowTimes) / 60*60*1000}分钟后兑换超时\n【兑换截止时间】${$.exchangeEndTime}\n请速去京喜APP->首页->好物0元造进行兑换`, { url: jxOpenUrl })
-        if ($.isNode()) allMessage += `【京东账号${$.index}】${$.nickName}\n【生产商品】${$.productName}${expiredTime}小时后兑换超时\n【兑换截止时间】${$.exchangeEndTime}\n请速去京喜APP->首页->好物0元造进行兑换${$.index !== cookiesArr.length ? '\n\n' : ''}`
-        flag = false;
-      }
-      //二:在可兑换的时候，0,2,4等等小时通知一次
-      if (nowHours % 2 === 0 && flag) {
-        $.msg($.name, ``, `【京东账号${$.index}】${$.nickName}\n【生产商品】${$.productName}已可兑换\n【兑换截止时间】${$.exchangeEndTime}\n请速去京喜APP->首页->好物0元造进行兑换`, {'open-url': jxOpenUrl, 'media-url': $.picture})
-        // if ($.isNode()) await notify.sendNotify(`${$.name} - 京东账号${$.index} - ${$.nickName}`, `【京东账号${$.index}】${$.nickName}\n【生产商品】${$.productName}已可兑换\n【兑换截止时间】${$.exchangeEndTime}\n请速去京喜APP->首页->好物0元造进行兑换`, { url: jxOpenUrl })
-        if ($.isNode()) allMessage += `【京东账号${$.index}】${$.nickName}\n【生产商品】${$.productName}已可兑换\n【兑换截止时间】${$.exchangeEndTime}\n请速去京喜APP->首页->好物0元造进行兑换${$.index !== cookiesArr.length ? '\n\n' : ''}`
-      }
-    }
-  }
-}
-async function showMsg() {
-  return new Promise(async resolve => {
-    message += `【收取自己零件】${$.pickUpMyselfComponent ? `获得${$.pickEle}电力` : `今日已达上限`}\n`;
-    message += `【收取好友零件】${$.pickUpMyselfComponent ? `获得${$.pickFriendEle}电力` : `今日已达上限`}\n`;
-    if ($.isNode() && process.env.DREAMFACTORY_NOTIFY_CONTROL) {
-      $.ctrTemp = `${process.env.DREAMFACTORY_NOTIFY_CONTROL}` === 'false';
-    } else if ($.getdata('jdDreamFactory')) {
-      $.ctrTemp = $.getdata('jdDreamFactory') === 'false';
-    } else {
-      $.ctrTemp = `${jdNotify}` === 'false';
-    }
-    if (new Date().getHours() === 22) {
-      $.msg($.name, '', `${message}`)
-      $.log(`\n${message}`);
-    } else {
-      $.log(`\n${message}`);
-    }
-    resolve()
-  })
-}
-function readShareCode() {
-  console.log(`开始`)
-  return new Promise(async resolve => {
-    $.get({url: `http://share.turinglabs.net/api/v3/jxfactory/query/${randomCount}/`, 'timeout': 10000}, (err, resp, data) => {
+    $.get(option, (err, resp, data) => {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
           console.log(`${$.name} API请求失败，请检查网路重试`)
         } else {
-          if (data) {
-            console.log(`随机取${randomCount}个码放到您固定的互助码后面(不影响已有固定互助)`)
-            data = JSON.parse(data);
+          $.getExchangeRewardsRes = {};
+          if (safeGet(data)) {
+            $.getExchangeRewardsRes = JSON.parse(data);
           }
         }
       } catch (e) {
-        $.logErr(e, resp)
+        $.logErr(e, resp);
       } finally {
-        resolve(data);
+        resolve();
       }
-    })
-    await $.wait(10000);
-    resolve()
+    });
   })
 }
-//格式化助力码
-function shareCodesFormat() {
-  return new Promise(async resolve => {
-    // console.log(`第${$.index}个京东账号的助力码:::${$.shareCodesArr[$.index - 1]}`)
-    $.newShareCodes = [];
-    if ($.shareCodesArr[$.index - 1]) {
-      $.newShareCodes = $.shareCodesArr[$.index - 1].split('@');
-    } else {
-      console.log(`由于您第${$.index}个京东账号未提供shareCode,将采纳本脚本自带的助力码\n`)
-      const tempIndex = $.index > inviteCodes.length ? (inviteCodes.length - 1) : ($.index - 1);
-      $.newShareCodes = inviteCodes[tempIndex].split('@');
+function exchange(saleInfoId, orderSource) {
+  let body = {"buyParam":{"orderSource":orderSource,"saleInfoId":saleInfoId},"deviceInfo":{}}
+  let opt = {
+    "url": "//jdjoy.jd.com/common/gift/new/exchange?reqSource=h5&invokeKey=Oex5GmEuqGep1WLC",
+    "data":body,
+    "credentials":"include","method":"POST","header":{"content-type":"application/json"}
+  }
+  return new Promise((resolve) => {
+    const option = {
+      url: "https:"+ taroRequest(opt)['url'],
+      body: `${JSON.stringify(body)}`,
+      headers: {
+        "Host": "jdjoy.jd.com",
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "zh-cn",
+        "Content-Type": "application/json",
+        "Origin": "https://jdjoy.jd.com",
+        "reqSource": "h5",
+        "Connection": "keep-alive",
+        "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
+        "Referer": "https://jdjoy.jd.com/pet/index",
+        "Content-Length": "10",
+        "Cookie": cookie
+      },
     }
-    const readShareCodeRes = await readShareCode();
-    if (readShareCodeRes && readShareCodeRes.code === 200) {
-      $.newShareCodes = [...new Set([...$.newShareCodes, ...(readShareCodeRes.data || [])])];
-    }
-    console.log(`第${$.index}个京东账号将要助力的好友${JSON.stringify($.newShareCodes)}`)
-    resolve();
-  })
-}
-function requireConfig() {
-  return new Promise(async resolve => {
-    tuanActiveId = $.isNode() ? (process.env.TUAN_ACTIVEID || tuanActiveId) : ($.getdata('tuanActiveId') || tuanActiveId);
-    if (!tuanActiveId) {
-      await updateTuanIdsCDN();
-      if ($.tuanConfigs && $.tuanConfigs['tuanActiveId']) {
-        tuanActiveId = $.tuanConfigs['tuanActiveId'];
-        console.log(`拼团活动ID: 获取成功 ${tuanActiveId}\n`)
-      } else {
-        if (!$.tuanConfigs) {
-          await updateTuanIdsCDN('https://cdn.jsdelivr.net/gh/gitupdate/updateTeam@master/shareCodes/jd_updateFactoryTuanId.json');
-          if ($.tuanConfigs && $.tuanConfigs['tuanActiveId']) {
-            tuanActiveId = $.tuanConfigs['tuanActiveId'];
-            console.log(`拼团活动ID: 获取成功 ${tuanActiveId}\n`)
-          } else {
-            console.log(`拼团活动ID：获取失败，将采取脚本内置活动ID\n`)
+    $.post(option, (err, resp, data) => {
+      try {
+        if (err) {
+          console.log(`${JSON.stringify(err)}`)
+          console.log(`${$.name} API请求失败，请检查网路重试`)
+        } else {
+          console.log(`兑换结果:${data}`);
+          $.exchangeRes = {};
+          if (safeGet(data)) {
+            $.exchangeRes = JSON.parse(data);
           }
         }
+      } catch (e) {
+        $.logErr(e, resp);
+      } finally {
+        resolve();
       }
-    } else {
-      console.log(`自定义拼团活动ID: 获取成功 ${tuanActiveId}`)
-    }
-    console.log(`开始获取${$.name}配置文件\n`);
-    //Node.js用户请在jdCookie.js处填写京东ck;
-    const shareCodes = $.isNode() ? require('./jdDreamFactoryShareCodes.js') : '';
-    console.log(`共${cookiesArr.length}个京东账号\n`);
-    $.shareCodesArr = [];
-    if ($.isNode()) {
-      Object.keys(shareCodes).forEach((item) => {
-        if (shareCodes[item]) {
-          $.shareCodesArr.push(shareCodes[item])
-        }
-      })
-    } else {
-      if ($.getdata('jd_jxFactory')) $.shareCodesArr = $.getdata('jd_jxFactory').split('\n').filter(item => item !== "" && item !== null && item !== undefined);
-      console.log(`\nBoxJs设置的${$.name}好友邀请码:${$.getdata('jd_jxFactory')}\n`);
-    }
-    // console.log(`\n种豆得豆助力码::${JSON.stringify($.shareCodesArr)}`);
-    console.log(`您提供了${$.shareCodesArr.length}个账号的${$.name}助力码\n`);
-    resolve()
+    });
   })
 }
 function TotalBean() {
@@ -1396,7 +310,7 @@ function TotalBean() {
         "Connection": "keep-alive",
         "Cookie": cookie,
         "Referer": "https://wqs.jd.com/my/jingdou/my.shtml?sceneval=2",
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
+        "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
       }
     }
     $.post(options, (err, resp, data) => {
@@ -1428,107 +342,34 @@ function TotalBean() {
     })
   })
 }
-function safeGet(data) {
-  try {
-    if (typeof JSON.parse(data) == "object") {
-      return true;
-    }
-  } catch (e) {
-    console.log(e);
-    console.log(`京东服务器访问数据为空，请检查自身设备网络情况`);
-    return false;
-  }
+function getJDServerTime() {
+  return new Promise(resolve => {
+    // console.log(Date.now())
+    $.get({url: "https://a.jd.com//ajax/queryServerData.html",headers:{
+        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/87.0.4280.88"
+      }}, async (err, resp, data) => {
+      try {
+        if (err) {
+          console.log(`${JSON.stringify(err)}`)
+          console.log(`${$.name} 获取京东服务器时间失败，请检查网路重试`)
+        } else {
+          data = JSON.parse(data);
+          $.jdTime = data['serverTime'];
+          // console.log(data['serverTime']);
+          // console.log(data['serverTime'] - Date.now())
+        }
+      } catch (e) {
+        $.logErr(e, resp)
+      } finally {
+        resolve($.jdTime);
+      }
+    })
+  })
 }
-function taskTuanUrl(functionId, body = '', stk) {
-  let url = `https://m.jingxi.com/dreamfactory/tuan/${functionId}?${body}&_time=${Date.now()}&_=${Date.now() + 2}&sceneval=2&g_login_type=1&_ste=1`
-  url += `&h5st=${decrypt(Date.now(), stk || '', '', url)}`
-  if (stk) {
-    url += `&_stk=${encodeURIComponent(stk)}`;
-  }
-  return {
-    url,
-    headers: {
-      "Accept": "*/*",
-      "Accept-Encoding": "gzip, deflate, br",
-      "Accept-Language": "zh-cn",
-      "Connection": "keep-alive",
-      "Cookie": cookie,
-      "Host": "m.jingxi.com",
-      "Referer": "https://st.jingxi.com/pingou/dream_factory/divide.html",
-      "User-Agent": "jdpingou"
-    }
-  }
-}
-
-function taskurl(functionId, body = '', stk) {
-  let url = `${JD_API_HOST}/dreamfactory/${functionId}?zone=dream_factory&${body}&sceneval=2&g_login_type=1&_time=${Date.now()}&_=${Date.now() + 2}&_ste=1`
-  url += `&h5st=${decrypt(Date.now(), stk, '', url)}`
-  if (stk) {
-    url += `&_stk=${encodeURIComponent(stk)}`;
-  }
-  return {
-    url,
-    headers: {
-      'Cookie': cookie,
-      'Host': 'm.jingxi.com',
-      'Accept': '*/*',
-      'Connection': 'keep-alive',
-      'User-Agent': functionId === 'AssistFriend' ? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36" : 'jdpingou',
-      'Accept-Language': 'zh-cn',
-      'Referer': 'https://wqsd.jd.com/pingou/dream_factory/index.html',
-      'Accept-Encoding': 'gzip, deflate, br',
-    }
-  }
-}
-function newtasksysUrl(functionId, taskId, stk) {
-  let url = `${JD_API_HOST}/newtasksys/newtasksys_front/${functionId}?source=dreamfactory&bizCode=dream_factory&sceneval=2&g_login_type=1&_time=${Date.now()}&_=${Date.now() + 2}&_ste=1`;
-  if (taskId) {
-    url += `&taskId=${taskId}`;
-  }
-  if (stk) {
-    url += `&_stk=${stk}`;
-  }
-  //传入url进行签名
-  url += `&h5st=${decrypt(Date.now(), stk, '', url)}`
-  return {
-    url,
-    "headers": {
-      'Cookie': cookie,
-      'Host': 'm.jingxi.com',
-      'Accept': '*/*',
-      'Connection': 'keep-alive',
-      'User-Agent': "jdpingou;iPhone;3.15.2;13.5.1;90bab9217f465a83a99c0b554a946b0b0d5c2f7a;network/wifi;model/iPhone12,1;appBuild/100365;ADID/696F8BD2-0820-405C-AFC0-3C6D028040E5;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/1;hasOCPay/0;supportBestPay/0;session/14;pap/JA2015_311210;brand/apple;supportJDSHWK/1;",
-      'Accept-Language': 'zh-cn',
-      'Referer': 'https://wqsd.jd.com/pingou/dream_factory/index.html',
-      'Accept-Encoding': 'gzip, deflate, br',
-    }
-  }
-}
-/*
-修改时间戳转换函数，京喜工厂原版修改
- */
-Date.prototype.Format = function (fmt) {
-  var e,
-      n = this, d = fmt, l = {
-        "M+": n.getMonth() + 1,
-        "d+": n.getDate(),
-        "D+": n.getDate(),
-        "h+": n.getHours(),
-        "H+": n.getHours(),
-        "m+": n.getMinutes(),
-        "s+": n.getSeconds(),
-        "w+": n.getDay(),
-        "q+": Math.floor((n.getMonth() + 3) / 3),
-        "S+": n.getMilliseconds()
-      };
-  /(y+)/i.test(d) && (d = d.replace(RegExp.$1, "".concat(n.getFullYear()).substr(4 - RegExp.$1.length)));
-  for (var k in l) {
-    if (new RegExp("(".concat(k, ")")).test(d)) {
-      var t, a = "S+" === k ? "000" : "00";
-      d = d.replace(RegExp.$1, 1 == RegExp.$1.length ? l[k] : ("".concat(a) + l[k]).substr("".concat(l[k]).length))
-    }
-  }
-  return d;
+async function get_diff_time() {
+  // console.log(`本机时间戳 ${Date.now()}`)
+  // console.log(`京东服务器时间戳 ${await getJDServerTime()}`)
+  return Date.now() - await getJDServerTime();
 }
 function jsonParse(str) {
   if (typeof str == "string") {
@@ -1541,129 +382,17 @@ function jsonParse(str) {
     }
   }
 }
-async function requestAlgo() {
-  $.fingerprint = await generateFp();
-  const options = {
-    "url": `https://cactus.jd.com/request_algo?g_ty=ajax`,
-    "headers": {
-      'Authority': 'cactus.jd.com',
-      'Pragma': 'no-cache',
-      'Cache-Control': 'no-cache',
-      'Accept': 'application/json',
-      'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1',
-      'Content-Type': 'application/json',
-      'Origin': 'https://st.jingxi.com',
-      'Sec-Fetch-Site': 'cross-site',
-      'Sec-Fetch-Mode': 'cors',
-      'Sec-Fetch-Dest': 'empty',
-      'Referer': 'https://st.jingxi.com/',
-      'Accept-Language': 'zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7'
-    },
-    'body': JSON.stringify({
-      "version": "1.0",
-      "fp": $.fingerprint,
-      "appId": $.appId.toString(),
-      "timestamp": Date.now(),
-      "platform": "web",
-      "expandParams": ""
-    })
-  }
-  new Promise(async resolve => {
-    $.post(options, (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`request_algo 签名参数API请求失败，请检查网路重试`)
-        } else {
-          if (data) {
-            // console.log(data);
-            data = JSON.parse(data);
-            if (data['status'] === 200) {
-              $.token = data.data.result.tk;
-              let enCryptMethodJDString = data.data.result.algo;
-              if (enCryptMethodJDString) $.enCryptMethodJD = new Function(`return ${enCryptMethodJDString}`)();
-              console.log(`获取签名参数成功！`)
-              console.log(`fp: ${$.fingerprint}`)
-              console.log(`token: ${$.token}`)
-              console.log(`enCryptMethodJD: ${enCryptMethodJDString}`)
-            } else {
-              console.log(`fp: ${$.fingerprint}`)
-              console.log('request_algo 签名参数API请求失败:')
-            }
-          } else {
-            console.log(`京东服务器返回空数据`)
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-function decrypt(time, stk, type, url) {
-  stk = stk || (url ? getUrlData(url, '_stk') : '')
-  if (stk) {
-    const timestamp = new Date(time).Format("yyyyMMddhhmmssSSS");
-    let hash1 = '';
-    if ($.fingerprint && $.token && $.enCryptMethodJD) {
-      hash1 = $.enCryptMethodJD($.token, $.fingerprint.toString(), timestamp.toString(), $.appId.toString(), $.CryptoJS).toString($.CryptoJS.enc.Hex);
-    } else {
-      const random = '5gkjB6SpmC9s';
-      $.token = `tk01wcdf61cb3a8nYUtHcmhSUFFCfddDPRvKvYaMjHkxo6Aj7dhzO+GXGFa9nPXfcgT+mULoF1b1YIS1ghvSlbwhE0Xc`;
-      $.fingerprint = 5287160221454703;
-      const str = `${$.token}${$.fingerprint}${timestamp}${$.appId}${random}`;
-      hash1 = $.CryptoJS.SHA512(str, $.token).toString($.CryptoJS.enc.Hex);
+function safeGet(data) {
+  try {
+    if (typeof JSON.parse(data) == "object") {
+      return true;
     }
-    let st = '';
-    stk.split(',').map((item, index) => {
-      st += `${item}:${getUrlData(url, item)}${index === stk.split(',').length -1 ? '' : '&'}`;
-    })
-    const hash2 = $.CryptoJS.HmacSHA256(st, hash1.toString()).toString($.CryptoJS.enc.Hex);
-    // console.log(`\nst:${st}`)
-    // console.log(`h5st:${["".concat(timestamp.toString()), "".concat(fingerprint.toString()), "".concat($.appId.toString()), "".concat(token), "".concat(hash2)].join(";")}\n`)
-    return encodeURIComponent(["".concat(timestamp.toString()), "".concat($.fingerprint.toString()), "".concat($.appId.toString()), "".concat($.token), "".concat(hash2)].join(";"))
-  } else {
-    return '20210318144213808;8277529360925161;10001;tk01w952a1b73a8nU0luMGtBanZTHCgj0KFVwDa4n5pJ95T/5bxO/m54p4MtgVEwKNev1u/BUjrpWAUMZPW0Kz2RWP8v;86054c036fe3bf0991bd9a9da1a8d44dd130c6508602215e50bb1e385326779d'
+  } catch (e) {
+    console.log(e);
+    console.log(`京东服务器访问数据为空，请检查自身设备网络情况`);
+    return false;
   }
 }
-
-/**
- * 获取url参数值
- * @param url
- * @param name
- * @returns {string}
- */
-function getUrlData(url, name) {
-  if (typeof URL !== "undefined") {
-    let urls = new URL(url);
-    let data = urls.searchParams.get(name);
-    return data ? data : '';
-  } else {
-    const query = url.match(/\?.*/)[0].substring(1)
-    const vars = query.split('&')
-    for (let i = 0; i < vars.length; i++) {
-      const pair = vars[i].split('=')
-      if (pair[0] === name) {
-        // return pair[1];
-        return vars[i].substr(vars[i].indexOf('=') + 1);
-      }
-    }
-    return ''
-  }
-}
-/**
- * 模拟生成 fingerprint
- * @returns {string}
- */
-function generateFp() {
-  let e = "0123456789";
-  let a = 13;
-  let i = '';
-  for (; a--; )
-    i += e[Math.random() * e.length | 0];
-  return (i + Date.now()).slice(0,16)
-}
+var _0xodV='jsjiami.com.v6',_0x3589=[_0xodV,'AMO6wrh8','w5FmZQ==','w7oZwrIXLQ==','w50Bw5tGwpd6w5k=','GsOTwqvDn8Kl','w6IAcsOBwpg=','NcOgAVos','EcOFE8OBaA==','w7sew75xwq0=','wpbCvyc=','wpnDsA/CvSTDnUTCrsKxw7fDjsKC','w4/ClMOVwoltX8OmEhg/w6VE','bEh1','fUhcwrk=','w4BzYS57w7QwMmXDjnjCh1lQBDfDu8KiwojCm8OBw59EQsO2wqg4JsOESsKTZGk=','wqDCuXLCisOeahfDtxo=','w7shKMO5wozCg205woXCvFciw4gIw7ttw5nDqcORbcOhwrjCucKtCsONX8K8J04/RA==','wrbCjMOKKMKGTAzCtcKOwqXCl0TDvMOEwrRz','LUwMwp19MxQiw6fDvMKLcg==','w54we8OJwr1Y','w6EDwogjKQ==','TmDDmkwM','wrbDnmVuXw==','aElM','JMOFQcKv','w7d8UBpG','w7oSw4M=','aHzDpiU=','w68dw5LDssOr','w446w7p6wps=','KHvCoWbDpg==','N8OrwqpBwqE=','KkgfdcKb','w7YtQsOLwro=','w5rCg8OZwpxj','w4MedsO+','fsKFwo3DumHDgw==','NEwEwr0=','JkYB','L8OWwr3DksKQ','w7TCucOPwpJb','Z0hGwqM=','JGY5U8KJ','wpbDjsOnw5R/Ni8=','OMOrEcOATg==','w5zCncKgcm0=','W0PDuXgZ','w6JzQQ==','woZsw7w/','w7sMw4bCrMON','BcONEw==','wqVqw5kXw4fCssKa','JkgVQA==','w5HCssKb','wrslFA==','a8KuJsKkXQ==','w41AeBNcJipqwq7ClQ==','w7IrasO3AMOoFcOo','LkkS','OMOeIw==','w4vDscOjbcKJ','wrjDvhLCrHfChw==','CcOtwpvClsOOw59/fA4=','w69sWw==','wrfCiMKfb8OMWkw=','CmXCocKa','w4gvw7c=','w5gaaw==','w5YvWsOwRQ==','wqd3w4lzw6zDm8KsaQ==','JMOMLA==','R8KfwrJt','BcOedMOjLS/CsMKd','wpbCv23Dgg==','wqbCpWg=','w4kMw4fCusKewo0=','w4Q3R8OPwrdawobDh8Kt','wqLDgHxJaA==','McOOCkcZ','w4Q4wqg9Iw==','XGHDt1ok','BBHChsKswp8=','w7TDlcKZ','woHCqnjCn8KcMQ==','MRLCpsKJwpjDjsOhwrs=','YVl7AA==','w4VMcQg=','wqYlAA==','DcOMwpjCssOp','VEZ8wqHCiQ==','w5QBw59F','wqbCqBLDpRA=','PCNQwqMhGsOP','wrlfw7tVw7k=','HMOBCMOGaA==','w6Eqw5XCjcOP','w4k7w6VCwrc=','AMOybMO7Fg==','JsOfZcOGNQ==','w7JWGig3','PCNXwqosMcOMwqk=','w6NtPQ==','w5pGWw9LPTBo','w41iQjVB','w680w5nDsMOg','DlPCsMKlwqc=','w41mfyVmw78=','w4gPw5jCh8Os','McOqNm47','w71ndTBR','woDCucKSXsOd','wr7DsFZT','w40Bw4Rf','w5gawpM=','TkVDwpXCnA==','F8O/wptQwpg=','Fg5AwrAO','OsOcD2rCgw==','worClMK6f8OT','wpTDji7CgAc=','wpDDmMOlw4B+','w4ltehJY','w4hdDTUt','w5smW8OBwq1V','w4wjbcOwIg==','w60+w5XCjcOe','wpnDs8Oiw6Nx','AsOEwrPDvMKy','L3PCrFTDpQ==','w6XClcOYwpF9VcO3TA==','DU0ecsKw','wqLDkjXCsQc=','wrDDiATCvyo=','w7nClcKhVQ==','wr3Cnx3DuiLCjw==','w6fCnsOCwo4=','WUxt','w6Erwq06Gg==','wp8UPsKbEA==','eMKEwr07','w4Awwq8VGg==','wqIqFMKVGMOnCw==','w70NwpMQLQ==','dX7DsFwP','w7YYw4Zqwr8=','wrLDqRHCiAY=','PsOwGcOVSA==','PS9SwoQT','woFlw7cTw5E=','MC5hwoAd','wrEpwrPDiAs=','w7EBRsO0wrI=','w73DnsKUwpDCgXI=','w6fCiMO2wo9H','woZbw7Vpw5w=','w7RAfixQ','e8KOwoDDsWDDj8O0w6c=','VGbDo3E9w6Nmwos=','w5wew5PCsMOP','w4AZacOPw5Q=','A8OUV8O7PiXCuw==','w7jDt8O/aMK+','w5AVwoA=','wqrDlMOlwok=','FMOfRA==','EE7Ds8KtUEY=','w4jDpMOjd8KCBMO7w7XDgQ==','e8KFwrc5wonCncOFFw==','c8Oww4DDl8KnLwDCpA==','wrDDnX9ZVA==','UMKnwozDj1s=','w60Zw5DDrcOvwpjDnQ==','d8KjwoQswo8=','M8O2SMOFEQ==','wr3DsE5EQis=','w74fw5g=','wqVqw5gTw4w=','w7EjwpIFMw==','wqt3L8Ktw4DCrzI=','wrzDg8OEw6Fz','w4FFWy5G','wowcGcKZKQ==','fGhoUjk=','w5ItVg==','H8OxwrE=','w7YlS8OwFw==','wpHCjMKPeMKDHg==','wqbDoV1JST4GwpjCow==','McO+CA==','IMOtIyzDvHzCtQ==','wr7CgsKYeA==','FMOWwoo=','O0YV','FRbClsKOw50=','w4BWOw==','T8Oqw4XCgw==','wrZ2GMK8w4rCiTpn','wr42HA==','w6HCnsOPwpVnVQ==','N8OLCXPChw==','w4sJw7nDjsOI','w68Mw4DCvg==','wpfDhcOiw5ViCw==','EMOvL8OZZg==','wovDj8OPw55wHDtvw7bDqMKF','wrrCnwrDnjnCg1k=','Xll8dms=','wpgNA8K7Jw==','w7xcACsT','em5wdC8=','S8KPwowHwrI=','w6QuQMOrw5g=','w555ejtt','WcOWw7LDv8Ko','w6XDlMK2wpjCgn8ETMK/wpJr','PMOxwrDDjg==','w5kewo02HsKZ','w7bDtMKke8KCAMO9w7fDnQ==','wonCkSvDuCQ=','w6QBbMOqHw==','YG9FRSs=','w7/CiMOBwrdZ','WMO/w5DDnsOkfyDCuQ5CwoFm','U8KFwpDDmHvDiMOjw60Mw7M=','NcORwrJFwoE=','w6fCvsO3wr1jw6vCtAgM','H18aV8K9','H0vCtcKtCBF1JcKL','Bw9YwosM','BsOaccOYKw==','w58QWcOCw6o=','w4DCssOuwqZO','PcOfHHLCgw==','A8OswqLDj8KA','w6c3SsOqFcOv','G8OqwprClsOHw5Y=','wpNVw5kQw5k=','aVVgXDY=','M8ONIlA+','HMOXCXHCsA==','w5Eqw7XDlcO0','w6vDgMOCe8KA','e8KFwo/DvHI=','jsjieAami.comZQUzGZKM.Fqvy6Jt=='];(function(_0x4bd822,_0x2bd6f7,_0xb4bdb3){var _0x1d68f6=function(_0x3e105c,_0xc95be1,_0xcc5f36,_0x1a5687,_0x23c90b){_0xc95be1=_0xc95be1>>0x8,_0x23c90b='po';var _0x5d93df='shift',_0x1f243b='push';if(_0xc95be1<_0x3e105c){while(--_0x3e105c){_0x1a5687=_0x4bd822[_0x5d93df]();if(_0xc95be1===_0x3e105c){_0xc95be1=_0x1a5687;_0xcc5f36=_0x4bd822[_0x23c90b+'p']();}else if(_0xc95be1&&_0xcc5f36['replace'](/[eAZQUzGZKMFqyJt=]/g,'')===_0xc95be1){_0x4bd822[_0x1f243b](_0x1a5687);}}_0x4bd822[_0x1f243b](_0x4bd822[_0x5d93df]());}return 0x771ce;};return _0x1d68f6(++_0x2bd6f7,_0xb4bdb3)>>_0x2bd6f7^_0xb4bdb3;}(_0x3589,0xec,0xec00));var _0x50c1=function(_0x5c10af,_0x1f4691){_0x5c10af=~~'0x'['concat'](_0x5c10af);var _0x5bb874=_0x3589[_0x5c10af];if(_0x50c1['klyzIc']===undefined){(function(){var _0x437fd3=function(){var _0x504885;try{_0x504885=Function('return\x20(function()\x20'+'{}.constructor(\x22return\x20this\x22)(\x20)'+');')();}catch(_0x358292){_0x504885=window;}return _0x504885;};var _0x1f0ec7=_0x437fd3();var _0x1b39dc='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';_0x1f0ec7['atob']||(_0x1f0ec7['atob']=function(_0x5f1d5f){var _0x579713=String(_0x5f1d5f)['replace'](/=+$/,'');for(var _0x1bcc49=0x0,_0x28d1f2,_0x31f98e,_0x3a5085=0x0,_0x52f8c8='';_0x31f98e=_0x579713['charAt'](_0x3a5085++);~_0x31f98e&&(_0x28d1f2=_0x1bcc49%0x4?_0x28d1f2*0x40+_0x31f98e:_0x31f98e,_0x1bcc49++%0x4)?_0x52f8c8+=String['fromCharCode'](0xff&_0x28d1f2>>(-0x2*_0x1bcc49&0x6)):0x0){_0x31f98e=_0x1b39dc['indexOf'](_0x31f98e);}return _0x52f8c8;});}());var _0x287809=function(_0x4dca12,_0x1f4691){var _0x172c88=[],_0x12e77f=0x0,_0x5b3a5f,_0x1064fc='',_0x26c85e='';_0x4dca12=atob(_0x4dca12);for(var _0x50b5c4=0x0,_0x4e9f15=_0x4dca12['length'];_0x50b5c4<_0x4e9f15;_0x50b5c4++){_0x26c85e+='%'+('00'+_0x4dca12['charCodeAt'](_0x50b5c4)['toString'](0x10))['slice'](-0x2);}_0x4dca12=decodeURIComponent(_0x26c85e);for(var _0x36a5b1=0x0;_0x36a5b1<0x100;_0x36a5b1++){_0x172c88[_0x36a5b1]=_0x36a5b1;}for(_0x36a5b1=0x0;_0x36a5b1<0x100;_0x36a5b1++){_0x12e77f=(_0x12e77f+_0x172c88[_0x36a5b1]+_0x1f4691['charCodeAt'](_0x36a5b1%_0x1f4691['length']))%0x100;_0x5b3a5f=_0x172c88[_0x36a5b1];_0x172c88[_0x36a5b1]=_0x172c88[_0x12e77f];_0x172c88[_0x12e77f]=_0x5b3a5f;}_0x36a5b1=0x0;_0x12e77f=0x0;for(var _0x3385b7=0x0;_0x3385b7<_0x4dca12['length'];_0x3385b7++){_0x36a5b1=(_0x36a5b1+0x1)%0x100;_0x12e77f=(_0x12e77f+_0x172c88[_0x36a5b1])%0x100;_0x5b3a5f=_0x172c88[_0x36a5b1];_0x172c88[_0x36a5b1]=_0x172c88[_0x12e77f];_0x172c88[_0x12e77f]=_0x5b3a5f;_0x1064fc+=String['fromCharCode'](_0x4dca12['charCodeAt'](_0x3385b7)^_0x172c88[(_0x172c88[_0x36a5b1]+_0x172c88[_0x12e77f])%0x100]);}return _0x1064fc;};_0x50c1['uNopam']=_0x287809;_0x50c1['bBBPYs']={};_0x50c1['klyzIc']=!![];}var _0x2685e3=_0x50c1['bBBPYs'][_0x5c10af];if(_0x2685e3===undefined){if(_0x50c1['MzNDcx']===undefined){_0x50c1['MzNDcx']=!![];}_0x5bb874=_0x50c1['uNopam'](_0x5bb874,_0x1f4691);_0x50c1['bBBPYs'][_0x5c10af]=_0x5bb874;}else{_0x5bb874=_0x2685e3;}return _0x5bb874;};function taroRequest(_0x4562b8){var _0x5e1be5={'Vxbak':function(_0x51c581,_0x5b34fe){return _0x51c581>_0x5b34fe;},'oAHvw':function(_0x301b4d,_0x45142b){return _0x301b4d>=_0x45142b;},'NmxTA':function(_0x4a7449,_0x35b5ad){return _0x4a7449+_0x35b5ad;},'fKyeQ':function(_0x55c935,_0x30de79){return _0x55c935+_0x30de79;},'PxtIu':function(_0x108ffa,_0x1f1c2c){return _0x108ffa===_0x1f1c2c;},'aonPe':_0x50c1('0','7^B*'),'Anwmc':_0x50c1('1','H4)l'),'wRaxF':function(_0x3ed935,_0x1dcb0a){return _0x3ed935>=_0x1dcb0a;},'jGaRg':function(_0x15d225,_0x1bf5cd){return _0x15d225+_0x1bf5cd;},'wUSiO':function(_0x29bc83,_0x377cd0){return _0x29bc83+_0x377cd0;},'plEXL':function(_0x14a436,_0x28dc15){return _0x14a436+_0x28dc15;},'qCKlI':function(_0x14014d,_0x2059f5){return _0x14014d!==_0x2059f5;},'aiwGl':_0x50c1('2','#o@B'),'AlsQu':_0x50c1('3','g8a8'),'WnBQj':_0x50c1('4','M4vD'),'CblXD':function(_0x338b17,_0x582862,_0x5b6da5){return _0x338b17(_0x582862,_0x5b6da5);},'pHyqn':function(_0x450ee2,_0xc9f580){return _0x450ee2 instanceof _0xc9f580;},'iYuZb':function(_0x13f9a2,_0x48a96a){return _0x13f9a2<_0x48a96a;},'zzWYr':function(_0x49fbc5,_0x4e09d8){return _0x49fbc5 instanceof _0x4e09d8;},'STnCh':function(_0x2af259,_0x1ae066){return _0x2af259||_0x1ae066;},'FjoWN':function(_0x588a20,_0x1f80db,_0x2aa526){return _0x588a20(_0x1f80db,_0x2aa526);},'CCtvW':function(_0x13b7c7,_0x39e512){return _0x13b7c7+_0x39e512;},'JgTsP':function(_0x2e2167,_0xd7f440){return _0x2e2167!==_0xd7f440;},'YyFbf':_0x50c1('5','IV09'),'nQOIF':_0x50c1('6','DOsV'),'oxfqy':_0x50c1('7','VKxZ'),'gDria':_0x50c1('8','@ri*'),'meULp':function(_0x476487,_0x10f522){return _0x476487<_0x10f522;},'fSaRv':_0x50c1('9','qs2T'),'XMTxF':function(_0x28b8e2,_0x4dbf6c){return _0x28b8e2+_0x4dbf6c;},'JWevk':function(_0x10ec95,_0x369849){return _0x10ec95>_0x369849;},'uKLDp':function(_0x4c38f4,_0x2d55b6){return _0x4c38f4>=_0x2d55b6;},'HvpAG':function(_0x43debb,_0x19bad6){return _0x43debb+_0x19bad6;},'hbfBJ':_0x50c1('a','qRp%'),'AaMvo':function(_0x206a17,_0x3a909b){return _0x206a17!==_0x3a909b;},'ecUFD':_0x50c1('b','S9Ns'),'FRjlU':_0x50c1('c','k1Z4'),'FBsRk':function(_0x1e4544,_0x26e31f){return _0x1e4544<_0x26e31f;},'ksMrO':function(_0x5e98b1,_0xeebb40){return _0x5e98b1===_0xeebb40;},'UConB':_0x50c1('d','#o@B'),'Wsgog':function(_0x1dcfcb,_0x6beb66){return _0x1dcfcb+_0x6beb66;},'CgnvR':function(_0x8d4df4,_0x737098){return _0x8d4df4+_0x737098;},'FXyGe':function(_0x5d6b80,_0x5cc42c){return _0x5d6b80===_0x5cc42c;},'GXiiI':_0x50c1('e','RHMX'),'wEitF':_0x50c1('f','qRp%'),'GpRjT':function(_0x370b36,_0x5bf5db){return _0x370b36===_0x5bf5db;},'TuYOF':_0x50c1('10','KG3M'),'fiFMi':function(_0x546b34,_0x9e5ce2){return _0x546b34===_0x9e5ce2;},'jtaNJ':_0x50c1('11','BG^f'),'SIsKG':_0x50c1('12','PoTt'),'YdXRN':function(_0x2f4dbf,_0x5b9186){return _0x2f4dbf!==_0x5b9186;},'qCqRP':_0x50c1('13','H4)l'),'LUOfF':_0x50c1('14','AgDC'),'CHQDz':_0x50c1('15','@ri*'),'XkXer':function(_0x269598,_0xd9b438){return _0x269598+_0xd9b438;},'bEUim':function(_0xa590e0,_0x5cad53){return _0xa590e0+_0x5cad53;},'kBDcT':function(_0x2dbc4d,_0x55e0b3){return _0x2dbc4d+_0x55e0b3;},'RBlMU':function(_0x5c5b2b,_0x113737){return _0x5c5b2b+_0x113737;},'TxkrC':function(_0x485ada,_0x50d1ab){return _0x485ada(_0x50d1ab);},'wkVOt':function(_0x7acc49,_0x5200f1){return _0x7acc49+_0x5200f1;},'MdGkP':function(_0x55e747,_0x24d20c,_0x597f8f){return _0x55e747(_0x24d20c,_0x597f8f);},'shZQD':_0x50c1('16','X[A!'),'cKJNx':_0x50c1('17','US(#'),'pTLQc':_0x50c1('18','UeQW'),'enbvr':function(_0x5a112c,_0x35db75){return _0x5a112c+_0x35db75;},'DXqTY':function(_0x1937b1,_0x21aed3){return _0x1937b1>_0x21aed3;},'CcGPt':_0x50c1('19','9qQF')};const _0x3e9406=$[_0x50c1('1a','k1Z4')]()?_0x5e1be5[_0x50c1('1b','qs2T')](require,_0x5e1be5[_0x50c1('1c','@1x0')]):CryptoJS;const _0x436006=_0x5e1be5[_0x50c1('1d','cmpJ')];const _0x248dc4=_0x3e9406[_0x50c1('1e','AgDC')][_0x50c1('1f','#s[4')][_0x50c1('20','*ii4')](_0x436006);const _0x12d918=_0x3e9406[_0x50c1('21','M4vD')][_0x50c1('22','@1x0')][_0x50c1('23','M4vD')](_0x5e1be5[_0x50c1('24','qRp%')]);let _0x522a40={'AesEncrypt':function AesEncrypt(_0x4562b8){var _0x24b556={'xBtoS':function(_0x33894c,_0x228f9a){return _0x5e1be5[_0x50c1('25','Ehp*')](_0x33894c,_0x228f9a);}};if(_0x5e1be5[_0x50c1('26','VKxZ')](_0x5e1be5[_0x50c1('27','48&e')],_0x5e1be5[_0x50c1('28','k1Z4')])){if(_0x4083de&&_0x5e1be5[_0x50c1('29','PoTt')](Object[_0x50c1('2a','KMz@')](_0x4083de)[_0x50c1('2b','DOsV')],0x0)){var _0x45d7e2=Object[_0x50c1('2c','9qQF')](_0x4083de)[_0x50c1('2d','48&e')](function(_0x3fb059){return _0x24b556[_0x50c1('2e','S9Ns')](_0x24b556[_0x50c1('2f','PoTt')](_0x3fb059,'='),_0x4083de[_0x3fb059]);})[_0x50c1('30','AgDC')]('&');return _0x5e1be5[_0x50c1('31','48&e')](_0x4562b8[_0x50c1('32','s)LE')]('?'),0x0)?_0x5e1be5[_0x50c1('33','RHMX')](_0x5e1be5[_0x50c1('34','cPY%')](_0x4562b8,'&'),_0x45d7e2):_0x5e1be5[_0x50c1('35','@1x0')](_0x5e1be5[_0x50c1('25','Ehp*')](_0x4562b8,'?'),_0x45d7e2);}return _0x4562b8;}else{var _0x4083de=_0x3e9406[_0x50c1('36','*ii4')][_0x50c1('37','p0^z')][_0x50c1('38','c)40')](_0x4562b8);return _0x3e9406[_0x50c1('39','FK(4')][_0x50c1('3a','7^B*')](_0x4083de,_0x248dc4,{'iv':_0x12d918,'mode':_0x3e9406[_0x50c1('3b','48&e')][_0x50c1('3c','cPY%')],'padding':_0x3e9406[_0x50c1('3d','@eMl')][_0x50c1('3e','SKUI')]})[_0x50c1('3f','kV1]')][_0x50c1('40','[Wu3')]();}},'AesDecrypt':function AesDecrypt(_0x4562b8){var _0x4c8a29=_0x3e9406[_0x50c1('41','48&e')][_0x50c1('42','g8a8')][_0x50c1('43','IV09')](_0x4562b8),_0x39b3d1=_0x3e9406[_0x50c1('41','48&e')][_0x50c1('44','BG^f')][_0x50c1('45','N!n4')](_0x4c8a29);return _0x3e9406[_0x50c1('46','kV1]')][_0x50c1('47','UeQW')](_0x39b3d1,_0x248dc4,{'iv':_0x12d918,'mode':_0x3e9406[_0x50c1('48','f3Wj')][_0x50c1('49','c)40')],'padding':_0x3e9406[_0x50c1('4a','KMz@')][_0x50c1('4b','[Wu3')]})[_0x50c1('4c','p0^z')](_0x3e9406[_0x50c1('4d','#o@B')][_0x50c1('4e','188E')])[_0x50c1('4f','#s[4')]();},'Base64Encode':function Base64Encode(_0x4562b8){var _0x2b69a4=_0x3e9406[_0x50c1('4d','#o@B')][_0x50c1('50','X[A!')][_0x50c1('43','IV09')](_0x4562b8);return _0x3e9406[_0x50c1('51','X[A!')][_0x50c1('52','c)40')][_0x50c1('53','k1Z4')](_0x2b69a4);},'Base64Decode':function Base64Decode(_0x4562b8){var _0x3d3752={'wUqMI':function(_0x54b178,_0x2e78d2){return _0x5e1be5[_0x50c1('54','cmpJ')](_0x54b178,_0x2e78d2);},'YaSlQ':function(_0x18154a,_0x33bc95){return _0x5e1be5[_0x50c1('55','#o@B')](_0x18154a,_0x33bc95);}};if(_0x5e1be5[_0x50c1('56','qs2T')](_0x5e1be5[_0x50c1('57','@1x0')],_0x5e1be5[_0x50c1('58','YCIf')])){return _0x3e9406[_0x50c1('59','yi#6')][_0x50c1('5a','X[A!')][_0x50c1('38','c)40')](_0x4562b8)[_0x50c1('5b','YCIf')](_0x3e9406[_0x50c1('41','48&e')][_0x50c1('5c','DPss')]);}else{var _0x5e6274=Object[_0x50c1('5d','kV1]')](_0x15bedb)[_0x50c1('5e','@eMl')](function(_0x405686){return _0x3d3752[_0x50c1('5f','N!n4')](_0x3d3752[_0x50c1('60','AgDC')](_0x405686,'='),_0x15bedb[_0x405686]);})[_0x50c1('61','qRp%')]('&');return _0x5e1be5[_0x50c1('62','KG3M')](_0x4562b8[_0x50c1('63','QIy0')]('?'),0x0)?_0x5e1be5[_0x50c1('64','p0^z')](_0x5e1be5[_0x50c1('65','RHMX')](_0x4562b8,'&'),_0x5e6274):_0x5e1be5[_0x50c1('66','c)40')](_0x5e1be5[_0x50c1('67','qRp%')](_0x4562b8,'?'),_0x5e6274);}},'Md5encode':function Md5encode(_0x4562b8){if(_0x5e1be5[_0x50c1('68','#s[4')](_0x5e1be5[_0x50c1('69','#s[4')],_0x5e1be5[_0x50c1('6a','CJw1')])){var _0x46e363=_0x15bedb[_0x3e9406];_0x4562b8[_0x50c1('6b','QIy0')](_0x46e363)&&!_0x52c084&&(_0x52c084=!0x0);}else{return _0x3e9406[_0x50c1('6c','kV1]')](_0x4562b8)[_0x50c1('6d','kV1]')]();}},'keyCode':_0x5e1be5[_0x50c1('6e','kV1]')]};const _0x10c259=function sortByLetter(_0x4562b8,_0x505fb9){if(_0x5e1be5[_0x50c1('6f','M4vD')](_0x4562b8,Array)){_0x505fb9=_0x505fb9||[];for(var _0x3d9086=0x0;_0x5e1be5[_0x50c1('70','f3Wj')](_0x3d9086,_0x4562b8[_0x50c1('71','@ri*')]);_0x3d9086++)_0x505fb9[_0x3d9086]=_0x5e1be5[_0x50c1('72','c)40')](sortByLetter,_0x4562b8[_0x3d9086],_0x505fb9[_0x3d9086]);}else!_0x5e1be5[_0x50c1('73','#o@B')](_0x4562b8,Array)&&_0x5e1be5[_0x50c1('74','*ii4')](_0x4562b8,Object)?(_0x505fb9=_0x5e1be5[_0x50c1('75','UeQW')](_0x505fb9,{}),Object[_0x50c1('76','cmpJ')](_0x4562b8)[_0x50c1('77','qRp%')]()[_0x50c1('78','qs2T')](function(_0x3d9086){_0x505fb9[_0x3d9086]=_0x5e1be5[_0x50c1('79','AgDC')](sortByLetter,_0x4562b8[_0x3d9086],_0x505fb9[_0x3d9086]);})):_0x505fb9=_0x4562b8;return _0x505fb9;};const _0x29a333=function isInWhiteAPI(_0x4562b8){var _0x3931ba={'UPzAq':function(_0x132f63,_0x15ffa6){return _0x5e1be5[_0x50c1('7a','VKxZ')](_0x132f63,_0x15ffa6);},'aCtWR':function(_0x1b9ea2,_0x418561){return _0x5e1be5[_0x50c1('7b','QIy0')](_0x1b9ea2,_0x418561);}};if(_0x5e1be5[_0x50c1('7c','g8a8')](_0x5e1be5[_0x50c1('7d','UeQW')],_0x5e1be5[_0x50c1('7e','BG^f')])){for(var _0x459be0=[_0x5e1be5[_0x50c1('7f','s)LE')],_0x5e1be5[_0x50c1('80','kV1]')]],_0x218261=!0x1,_0x3e9406=0x0;_0x5e1be5[_0x50c1('81','CJw1')](_0x3e9406,_0x459be0[_0x50c1('82','k1Z4')]);_0x3e9406++){if(_0x5e1be5[_0x50c1('83','[Wu3')](_0x5e1be5[_0x50c1('84','c)40')],_0x5e1be5[_0x50c1('85','s)LE')])){return _0x3931ba[_0x50c1('86','S9Ns')](_0x3931ba[_0x50c1('87','Ehp*')](_0x4562b8,'='),_0x459be0[_0x4562b8]);}else{var _0x436006=_0x459be0[_0x3e9406];_0x4562b8[_0x50c1('88','PoTt')](_0x436006)&&!_0x218261&&(_0x218261=!0x0);}}return _0x218261;}else{_0x459be0[_0x218261]=_0x5e1be5[_0x50c1('89','48&e')](sortByLetter,_0x4562b8[_0x218261],_0x459be0[_0x218261]);}};const _0x2a2c3c=function addQueryToPath(_0x4562b8,_0xf37fc9){var _0x39723c={'TPNkp':function(_0x722ea9,_0x350bb3){return _0x5e1be5[_0x50c1('8a','BG^f')](_0x722ea9,_0x350bb3);}};if(_0xf37fc9&&_0x5e1be5[_0x50c1('8b','BG^f')](Object[_0x50c1('8c','cPY%')](_0xf37fc9)[_0x50c1('8d','KG3M')],0x0)){var _0x47e0e3=Object[_0x50c1('8e','PoTt')](_0xf37fc9)[_0x50c1('8f','DPss')](function(_0x4562b8){return _0x39723c[_0x50c1('90','qs2T')](_0x39723c[_0x50c1('91','@eMl')](_0x4562b8,'='),_0xf37fc9[_0x4562b8]);})[_0x50c1('92','188E')]('&');return _0x5e1be5[_0x50c1('93','qs2T')](_0x4562b8[_0x50c1('94','@eMl')]('?'),0x0)?_0x5e1be5[_0x50c1('95','qs2T')](_0x5e1be5[_0x50c1('96','@1x0')](_0x4562b8,'&'),_0x47e0e3):_0x5e1be5[_0x50c1('97','qRp%')](_0x5e1be5[_0x50c1('98','BG^f')](_0x4562b8,'?'),_0x47e0e3);}return _0x4562b8;};const _0x40f690=function apiConvert(_0x4562b8){var _0xd2baca={'eHPys':function(_0x5982a8,_0x2e7446){return _0x5e1be5[_0x50c1('99','RHMX')](_0x5982a8,_0x2e7446);},'BGoRN':_0x5e1be5[_0x50c1('9a','QIy0')]};if(_0x5e1be5[_0x50c1('9b','7^B*')](_0x5e1be5[_0x50c1('9c','QIy0')],_0x5e1be5[_0x50c1('9d','7vaA')])){for(var _0x5ed4be=_0x12d918,_0x4e947a=0x0;_0x5e1be5[_0x50c1('9e','k1Z4')](_0x4e947a,_0x5ed4be[_0x50c1('9f','yi#6')]);_0x4e947a++){if(_0x5e1be5[_0x50c1('a0','PoTt')](_0x5e1be5[_0x50c1('a1','p0^z')],_0x5e1be5[_0x50c1('a2','@ri*')])){var _0x3e9406=_0x5ed4be[_0x4e947a];_0x4562b8[_0x50c1('a3','DOsV')](_0x3e9406)&&!_0x4562b8[_0x50c1('a4','@1x0')](_0x5e1be5[_0x50c1('a5','c)40')](_0x5e1be5[_0x50c1('a6','KMz@')],_0x3e9406))&&(_0x4562b8=_0x4562b8[_0x50c1('a7','#s[4')](_0x3e9406,_0x5e1be5[_0x50c1('a8','IV09')](_0x5e1be5[_0x50c1('9a','QIy0')],_0x3e9406)));}else{var _0x4f6d0b=_0x3e9406[_0x50c1('a9','qs2T')][_0x50c1('aa','s)LE')][_0x50c1('38','c)40')](_0x4562b8);return _0x3e9406[_0x50c1('ab','#s[4')][_0x50c1('ac','tFYr')][_0x50c1('ad','IV09')](_0x4f6d0b);}}return _0x4562b8;}else{var _0x3fa031=_0x5ed4be[_0x4e947a];_0x4562b8[_0x50c1('ae','188E')](_0x3fa031)&&!_0x4562b8[_0x50c1('af','^XlU')](_0xd2baca[_0x50c1('b0','cmpJ')](_0xd2baca[_0x50c1('b1','DOsV')],_0x3fa031))&&(_0x4562b8=_0x4562b8[_0x50c1('b2','M4vD')](_0x3fa031,_0xd2baca[_0x50c1('b3','188E')](_0xd2baca[_0x50c1('b4','#s[4')],_0x3fa031)));}};var _0x15bedb=_0x4562b8,_0x52c084=(_0x15bedb[_0x50c1('b5','cmpJ')],_0x15bedb[_0x50c1('b6','c)40')]);_0x52c084+=_0x5e1be5[_0x50c1('b7','7^B*')](_0x5e1be5[_0x50c1('b8','qs2T')](_0x52c084[_0x50c1('b9','US(#')]('?'),-0x1)?'&':'?',_0x5e1be5[_0x50c1('ba','s)LE')]);var _0x37f351=function getTimeSign(_0x4562b8){if(_0x5e1be5[_0x50c1('bb','*ii4')](_0x5e1be5[_0x50c1('bc','@eMl')],_0x5e1be5[_0x50c1('bd','H4)l')])){var _0x1f5dc7=_0x3e9406[_0x50c1('be','k1Z4')][_0x50c1('bf','S9Ns')][_0x50c1('c0','[Wu3')](_0x4562b8),_0x5cdf16=_0x3e9406[_0x50c1('21','M4vD')][_0x50c1('c1','UeQW')][_0x50c1('c2','cmpJ')](_0x1f5dc7);return _0x3e9406[_0x50c1('c3','g8a8')][_0x50c1('c4','FK(4')](_0x5cdf16,_0x248dc4,{'iv':_0x12d918,'mode':_0x3e9406[_0x50c1('c5','UeQW')][_0x50c1('c6','S9Ns')],'padding':_0x3e9406[_0x50c1('c7','48&e')][_0x50c1('c8','YCIf')]})[_0x50c1('6d','kV1]')](_0x3e9406[_0x50c1('c9','CJw1')][_0x50c1('ca','^XlU')])[_0x50c1('cb','US(#')]();}else{var _0x15bedb=_0x4562b8[_0x50c1('cc','@eMl')],_0x52c084=_0x4562b8[_0x50c1('cd','PoTt')],_0x3e9406=_0x5e1be5[_0x50c1('ce','g8a8')](void 0x0,_0x52c084)?_0x5e1be5[_0x50c1('cf','M4vD')]:_0x52c084,_0x436006=_0x4562b8[_0x50c1('d0','c)40')],_0x12d918=_0x4562b8[_0x50c1('d1','s)LE')],_0x49e71f=_0x5e1be5[_0x50c1('d2','RHMX')](void 0x0,_0x12d918)?{}:_0x12d918,_0x40c97f=_0x3e9406[_0x50c1('d3','s)LE')](),_0x41cd7a=_0x522a40[_0x50c1('d4','KG3M')],_0x4cc6fb=_0x49e71f[_0x5e1be5[_0x50c1('d5','DPss')]]||_0x49e71f[_0x5e1be5[_0x50c1('d6','@eMl')]]||'',_0x43d27f='',_0x341f8b=+new Date();return _0x43d27f=_0x5e1be5[_0x50c1('d7','CJw1')](_0x5e1be5[_0x50c1('d8','H4)l')],_0x40c97f)&&(_0x5e1be5[_0x50c1('d9','188E')](_0x5e1be5[_0x50c1('da','KMz@')],_0x40c97f)||_0x5e1be5[_0x50c1('db','*ii4')](_0x5e1be5[_0x50c1('dc','^XlU')],_0x4cc6fb[_0x50c1('dd','yi#6')]())&&_0x436006&&Object[_0x50c1('de','S9Ns')](_0x436006)[_0x50c1('df','qs2T')])?_0x522a40[_0x50c1('e0','IV09')](_0x5e1be5[_0x50c1('e1','KG3M')](_0x5e1be5[_0x50c1('e2','[Wu3')](_0x5e1be5[_0x50c1('e3','H4)l')](_0x5e1be5[_0x50c1('e4','wxfN')](_0x522a40[_0x50c1('e5','^XlU')](_0x522a40[_0x50c1('e6','DOsV')](_0x5e1be5[_0x50c1('e7','VKxZ')]('',JSON[_0x50c1('e8','wxfN')](_0x5e1be5[_0x50c1('e9','48&e')](_0x10c259,_0x436006))))),'_'),_0x41cd7a),'_'),_0x341f8b)):_0x522a40[_0x50c1('ea','tFYr')](_0x5e1be5[_0x50c1('eb','QIy0')](_0x5e1be5[_0x50c1('ec','#s[4')](_0x5e1be5[_0x50c1('ed','KMz@')]('_',_0x41cd7a),'_'),_0x341f8b)),_0x5e1be5[_0x50c1('ee','wxfN')](_0x29a333,_0x15bedb)&&(_0x15bedb=_0x5e1be5[_0x50c1('ef','g8a8')](_0x2a2c3c,_0x15bedb,{'lks':_0x43d27f,'lkt':_0x341f8b}),_0x15bedb=_0x5e1be5[_0x50c1('f0','S9Ns')](_0x40f690,_0x15bedb)),Object[_0x50c1('f1','[Wu3')](_0x4562b8,{'url':_0x15bedb});}}(_0x4562b8=Object[_0x50c1('f2','N!n4')](_0x4562b8,{'url':_0x52c084}));return _0x37f351;};_0xodV='jsjiami.com.v6';
 // prettier-ignore
 function Env(t,e){"undefined"!=typeof process&&JSON.stringify(process.env).indexOf("GITHUB")>-1&&process.exit(0);class s{constructor(t){this.env=t}send(t,e="GET"){t="string"==typeof t?{url:t}:t;let s=this.get;return"POST"===e&&(s=this.post),new Promise((e,i)=>{s.call(this,t,(t,s,r)=>{t?i(t):e(s)})})}get(t){return this.send.call(this.env,t)}post(t){return this.send.call(this.env,t,"POST")}}return new class{constructor(t,e){this.name=t,this.http=new s(this),this.data=null,this.dataFile="box.dat",this.logs=[],this.isMute=!1,this.isNeedRewrite=!1,this.logSeparator="\n",this.startTime=(new Date).getTime(),Object.assign(this,e),this.log("",`🔔${this.name}, 开始!`)}isNode(){return"undefined"!=typeof module&&!!module.exports}isQuanX(){return"undefined"!=typeof $task}isSurge(){return"undefined"!=typeof $httpClient&&"undefined"==typeof $loon}isLoon(){return"undefined"!=typeof $loon}toObj(t,e=null){try{return JSON.parse(t)}catch{return e}}toStr(t,e=null){try{return JSON.stringify(t)}catch{return e}}getjson(t,e){let s=e;const i=this.getdata(t);if(i)try{s=JSON.parse(this.getdata(t))}catch{}return s}setjson(t,e){try{return this.setdata(JSON.stringify(t),e)}catch{return!1}}getScript(t){return new Promise(e=>{this.get({url:t},(t,s,i)=>e(i))})}runScript(t,e){return new Promise(s=>{let i=this.getdata("@chavy_boxjs_userCfgs.httpapi");i=i?i.replace(/\n/g,"").trim():i;let r=this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout");r=r?1*r:20,r=e&&e.timeout?e.timeout:r;const[o,h]=i.split("@"),n={url:`http://${h}/v1/scripting/evaluate`,body:{script_text:t,mock_type:"cron",timeout:r},headers:{"X-Key":o,Accept:"*/*"}};this.post(n,(t,e,i)=>s(i))}).catch(t=>this.logErr(t))}loaddata(){if(!this.isNode())return{};{this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),e=this.path.resolve(process.cwd(),this.dataFile),s=this.fs.existsSync(t),i=!s&&this.fs.existsSync(e);if(!s&&!i)return{};{const i=s?t:e;try{return JSON.parse(this.fs.readFileSync(i))}catch(t){return{}}}}}writedata(){if(this.isNode()){this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),e=this.path.resolve(process.cwd(),this.dataFile),s=this.fs.existsSync(t),i=!s&&this.fs.existsSync(e),r=JSON.stringify(this.data);s?this.fs.writeFileSync(t,r):i?this.fs.writeFileSync(e,r):this.fs.writeFileSync(t,r)}}lodash_get(t,e,s){const i=e.replace(/\[(\d+)\]/g,".$1").split(".");let r=t;for(const t of i)if(r=Object(r)[t],void 0===r)return s;return r}lodash_set(t,e,s){return Object(t)!==t?t:(Array.isArray(e)||(e=e.toString().match(/[^.[\]]+/g)||[]),e.slice(0,-1).reduce((t,s,i)=>Object(t[s])===t[s]?t[s]:t[s]=Math.abs(e[i+1])>>0==+e[i+1]?[]:{},t)[e[e.length-1]]=s,t)}getdata(t){let e=this.getval(t);if(/^@/.test(t)){const[,s,i]=/^@(.*?)\.(.*?)$/.exec(t),r=s?this.getval(s):"";if(r)try{const t=JSON.parse(r);e=t?this.lodash_get(t,i,""):e}catch(t){e=""}}return e}setdata(t,e){let s=!1;if(/^@/.test(e)){const[,i,r]=/^@(.*?)\.(.*?)$/.exec(e),o=this.getval(i),h=i?"null"===o?null:o||"{}":"{}";try{const e=JSON.parse(h);this.lodash_set(e,r,t),s=this.setval(JSON.stringify(e),i)}catch(e){const o={};this.lodash_set(o,r,t),s=this.setval(JSON.stringify(o),i)}}else s=this.setval(t,e);return s}getval(t){return this.isSurge()||this.isLoon()?$persistentStore.read(t):this.isQuanX()?$prefs.valueForKey(t):this.isNode()?(this.data=this.loaddata(),this.data[t]):this.data&&this.data[t]||null}setval(t,e){return this.isSurge()||this.isLoon()?$persistentStore.write(t,e):this.isQuanX()?$prefs.setValueForKey(t,e):this.isNode()?(this.data=this.loaddata(),this.data[e]=t,this.writedata(),!0):this.data&&this.data[e]||null}initGotEnv(t){this.got=this.got?this.got:require("got"),this.cktough=this.cktough?this.cktough:require("tough-cookie"),this.ckjar=this.ckjar?this.ckjar:new this.cktough.CookieJar,t&&(t.headers=t.headers?t.headers:{},void 0===t.headers.Cookie&&void 0===t.cookieJar&&(t.cookieJar=this.ckjar))}get(t,e=(()=>{})){t.headers&&(delete t.headers["Content-Type"],delete t.headers["Content-Length"]),this.isSurge()||this.isLoon()?(this.isSurge()&&this.isNeedRewrite&&(t.headers=t.headers||{},Object.assign(t.headers,{"X-Surge-Skip-Scripting":!1})),$httpClient.get(t,(t,s,i)=>{!t&&s&&(s.body=i,s.statusCode=s.status),e(t,s,i)})):this.isQuanX()?(this.isNeedRewrite&&(t.opts=t.opts||{},Object.assign(t.opts,{hints:!1})),$task.fetch(t).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>e(t))):this.isNode()&&(this.initGotEnv(t),this.got(t).on("redirect",(t,e)=>{try{if(t.headers["set-cookie"]){const s=t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();s&&this.ckjar.setCookieSync(s,null),e.cookieJar=this.ckjar}}catch(t){this.logErr(t)}}).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>{const{message:s,response:i}=t;e(s,i,i&&i.body)}))}post(t,e=(()=>{})){if(t.body&&t.headers&&!t.headers["Content-Type"]&&(t.headers["Content-Type"]="application/x-www-form-urlencoded"),t.headers&&delete t.headers["Content-Length"],this.isSurge()||this.isLoon())this.isSurge()&&this.isNeedRewrite&&(t.headers=t.headers||{},Object.assign(t.headers,{"X-Surge-Skip-Scripting":!1})),$httpClient.post(t,(t,s,i)=>{!t&&s&&(s.body=i,s.statusCode=s.status),e(t,s,i)});else if(this.isQuanX())t.method="POST",this.isNeedRewrite&&(t.opts=t.opts||{},Object.assign(t.opts,{hints:!1})),$task.fetch(t).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>e(t));else if(this.isNode()){this.initGotEnv(t);const{url:s,...i}=t;this.got.post(s,i).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>{const{message:s,response:i}=t;e(s,i,i&&i.body)})}}time(t,e=null){const s=e?new Date(e):new Date;let i={"M+":s.getMonth()+1,"d+":s.getDate(),"H+":s.getHours(),"m+":s.getMinutes(),"s+":s.getSeconds(),"q+":Math.floor((s.getMonth()+3)/3),S:s.getMilliseconds()};/(y+)/.test(t)&&(t=t.replace(RegExp.$1,(s.getFullYear()+"").substr(4-RegExp.$1.length)));for(let e in i)new RegExp("("+e+")").test(t)&&(t=t.replace(RegExp.$1,1==RegExp.$1.length?i[e]:("00"+i[e]).substr((""+i[e]).length)));return t}msg(e=t,s="",i="",r){const o=t=>{if(!t)return t;if("string"==typeof t)return this.isLoon()?t:this.isQuanX()?{"open-url":t}:this.isSurge()?{url:t}:void 0;if("object"==typeof t){if(this.isLoon()){let e=t.openUrl||t.url||t["open-url"],s=t.mediaUrl||t["media-url"];return{openUrl:e,mediaUrl:s}}if(this.isQuanX()){let e=t["open-url"]||t.url||t.openUrl,s=t["media-url"]||t.mediaUrl;return{"open-url":e,"media-url":s}}if(this.isSurge()){let e=t.url||t.openUrl||t["open-url"];return{url:e}}}};if(this.isMute||(this.isSurge()||this.isLoon()?$notification.post(e,s,i,o(r)):this.isQuanX()&&$notify(e,s,i,o(r))),!this.isMuteLog){let t=["","==============📣系统通知📣=============="];t.push(e),s&&t.push(s),i&&t.push(i),console.log(t.join("\n")),this.logs=this.logs.concat(t)}}log(...t){t.length>0&&(this.logs=[...this.logs,...t]),console.log(t.join(this.logSeparator))}logErr(t,e){const s=!this.isSurge()&&!this.isQuanX()&&!this.isLoon();s?this.log("",`❗️${this.name}, 错误!`,t.stack):this.log("",`❗️${this.name}, 错误!`,t)}wait(t){return new Promise(e=>setTimeout(e,t))}done(t={}){const e=(new Date).getTime(),s=(e-this.startTime)/1e3;this.log("",`🔔${this.name}, 结束! 🕛 ${s} 秒`),this.log(),(this.isSurge()||this.isQuanX()||this.isLoon())&&$done(t)}}(t,e)}
