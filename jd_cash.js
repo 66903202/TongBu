@@ -30,6 +30,7 @@ let cookiesArr = [], cookie = '', message;
 let helpAuthor = true;
 const randomCount = $.isNode() ? 5 : 5;
 let cash_exchange = false;//是否消耗2元红包兑换200京豆，默认否
+let cash_exchange2 = false;//是否消耗2元红包兑换200京豆，默认否
 const inviteCodes = [
   `eU9Yau6yNPkm9zrVzHsb3w@eU9YLarDP6Z1rRq8njtZ@eU9YN6nLObVHriuNuA9O`
 ]
@@ -91,6 +92,7 @@ async function jdCash() {
   await getReward('2');
   $.exchangeBeanNum = 0;
   cash_exchange = $.isNode() ? (process.env.CASH_EXCHANGE ? process.env.CASH_EXCHANGE : `${cash_exchange}`) : ($.getdata('cash_exchange') ? $.getdata('cash_exchange') : `${cash_exchange}`);
+  cash_exchange2 = $.isNode() ? (process.env.CASH_EXCHANGE2 ? process.env.CASH_EXCHANGE2 : `${cash_exchange2}`) : ($.getdata('cash_exchange2') ? $.getdata('cash_exchange2') : `${cash_exchange2}`);
   if (cash_exchange === 'true') {
     console.log(`\n\n开始花费2元红包兑换200京豆，一周可换四次`)
     for (let item of ["-1", "0", "1", "2", "3"]) {
@@ -108,6 +110,8 @@ async function jdCash() {
     if ($.exchangeBeanNum) {
       message += `兑换京豆成功，获得${$.exchangeBeanNum * 100}京豆\n`;
     }
+  }
+  if (cash_exchange2 === 'true') {
     await exchange1();
   }
   await index(true)
