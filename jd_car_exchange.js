@@ -48,7 +48,7 @@ const JD_API_HOST = 'https://car-member.jd.com/api/';
     $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
     return;
   }
-  for (let j = 0; j < 20; ++j)
+  for (let j = 0; j < 2; ++j)
     for (let i = 0; i < cookiesArr.length; i++) {
       if (cookiesArr[i]) {
         cookie = cookiesArr[i];
@@ -59,6 +59,7 @@ const JD_API_HOST = 'https://car-member.jd.com/api/';
         $.nickName = '';
         message = '';
         await jdCar();
+        await $.wait(2000)
       }
     }
 })()
