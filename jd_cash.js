@@ -289,7 +289,8 @@ function exchange2(node) {
   }
   return new Promise((resolve) => {
     const options = {
-      url: `${JD_API_HOST}?functionId=cash_exchangeBeans&t=${Date.now()}&${body}`,
+      //url: `${JD_API_HOST}?functionId=cash_exchangeBeans&t=${Date.now()}&${body}`,
+      url: `${JD_API_HOST}?functionId=cash_getRedPacket&t=${Date.now()}&${body}`,
       body: `body=${escape(JSON.stringify(data))}`,
       headers: {
         'Cookie': cookie,
