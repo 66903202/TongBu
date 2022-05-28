@@ -135,3 +135,5 @@
 15 0,12,22 * * * node /scripts/jd_jxmc.js >> /scripts/logs/jd_jxmc.log 2>&1
 #京东试用
 10 10,18 * * * node /scripts/jd_try.js >> /scripts/logs/jd_try.log 2>&1
+#东东电竞经理
+15 10 * * *  node /scripts/jd_djjl.js >> /scripts/logs/jd_djjl.log 2>&1
